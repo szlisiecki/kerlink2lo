@@ -1,4 +1,4 @@
-package com.orange.lo.sample.kerlinl2lo.kerlink.api;
+package com.orange.lo.sample.kerlink2lo.kerlink.api;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -21,12 +21,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import com.orange.lo.sample.kerlinl2lo.kerlink.KerlinkProperties;
-import com.orange.lo.sample.kerlinl2lo.kerlink.api.model.EndDeviceDto;
-import com.orange.lo.sample.kerlinl2lo.kerlink.api.model.JwtDto;
-import com.orange.lo.sample.kerlinl2lo.kerlink.api.model.LinkDto;
-import com.orange.lo.sample.kerlinl2lo.kerlink.api.model.PaginatedDto;
-import com.orange.lo.sample.kerlinl2lo.kerlink.api.model.UserDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.KerlinkProperties;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.EndDeviceDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.JwtDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.LinkDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.PaginatedDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.UserDto;
 
 @Component
 @EnableScheduling

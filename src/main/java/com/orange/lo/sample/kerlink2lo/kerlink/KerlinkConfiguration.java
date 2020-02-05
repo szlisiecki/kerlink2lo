@@ -1,4 +1,4 @@
-package com.orange.lo.sample.kerlinl2lo.kerlink;
+package com.orange.lo.sample.kerlink2lo.kerlink;
 
 import org.springframework.context.annotation.Configuration;
 

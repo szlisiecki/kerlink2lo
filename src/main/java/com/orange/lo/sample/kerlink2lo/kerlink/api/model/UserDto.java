@@ -1,4 +1,4 @@
-package com.orange.lo.sample.kerlinl2lo.kerlink.api.model;
+package com.orange.lo.sample.kerlink2lo.kerlink.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,6 +26,5 @@ public class UserDto {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}  
-	
+	}
 }

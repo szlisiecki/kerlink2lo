@@ -7,3 +7,10 @@ kerlink:
   login: szymon.lisiecki
   password: \65~R?8yv34u
   page-size: 2
+  
+lo:
+  api-key: 7eccf568340943278c0495654b5de320
+  devices-url: https://liveobjects.orange-business.com/api/v1/deviceMgt/devices
+  page-size: 1
+  properties-key: platform
+  properties-value: kerlink

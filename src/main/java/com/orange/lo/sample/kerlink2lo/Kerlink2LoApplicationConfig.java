@@ -5,7 +5,7 @@
 * LICENSE file in the root directory of this source tree. 
 */
 
-package com.orange.lo.sample.kerlinl2lo;
+package com.orange.lo.sample.kerlink2lo;
 
 import org.springframework.context.annotation.Configuration;
 

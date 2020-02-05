@@ -1,4 +1,4 @@
-package com.orange.lo.sample.kerlinl2lo.kerlink.api.model;
+package com.orange.lo.sample.kerlink2lo.kerlink.api.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JwtDto {
@@ -11,8 +11,7 @@ public class JwtDto {
 
   @JsonProperty("token")
   private String token = null;
-  
-  
+
   public Long getExpiredDate() {
     return expiredDate;
   }
@@ -24,6 +23,7 @@ public class JwtDto {
   public String getTokenType() {
     return tokenType;
   }
+
   public void setTokenType(String tokenType) {
     this.tokenType = tokenType;
   }
@@ -31,6 +31,7 @@ public class JwtDto {
   public String getToken() {
     return token;
   }
+
   public void setToken(String token) {
     this.token = token;
   }  

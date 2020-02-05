@@ -1,4 +1,4 @@
-package com.orange.lo.sample.kerlinl2lo.kerlink.api.model;
+package com.orange.lo.sample.kerlink2lo.kerlink.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,28 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EndDeviceDto {
 
-	@JsonProperty("devEui")
-	private String devEui = null;
-	
-	@JsonProperty("name")
-	private String name = null;
-	
 	@JsonProperty("devAddr")
 	private String devAddr = null;
 
 	@JsonProperty("country")
 	private String country = null;
 
+	@JsonProperty("devEui")
+	private String devEui = null;
+
 	@JsonProperty("status")
 	private String status = null;
-
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getDevAddr() {
 		return devAddr;
@@ -63,7 +52,7 @@ public class EndDeviceDto {
 
 	@Override
 	public String toString() {
-		return "EndDeviceDto [devEui=" + devEui + ", name=" + name + ", devAddr=" + devAddr + ", country=" + country
-				+ ", status=" + status + "]";
+		return "EndDeviceDto [devAddr=" + devAddr + ", country=" + country + ", devEui=" + devEui + ", status=" + status
+				+ "]";
 	}
 }
