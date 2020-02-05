@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,39 +50,24 @@ public class LoDeviceProvider {
     public List<LoDevice> getDevices() {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
         for (int offset = 0; ; offset++) {
-            LOG.info(getUrl(offset));
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getUrl(offset), HttpMethod.GET, entity, LoDevice[].class);
-            LOG.info(offset + " " + response.getBody().length);
+            LOG.debug("Calling LO url {}, and got {} devices", getUrl(offset), response.getBody().length);
             if (response.getBody().length == 0)
                 break;
-            for (LoDevice device : Arrays.asList(response.getBody()))
-                LOG.info(device.toString());
-            LOG.info("\n");
             devices.addAll(Arrays.asList(response.getBody()));
             if (response.getBody().length < loProperties.getPageSize())
                 break;
         }
-        LOG.info("Devices: " + devices.toString());
+        LOG.debug("Devices: " + devices.toString());
         return devices;
     }
 
     public void addDevice(String deviceId, String deviceName, Map<String, String> properties) {
         LoDevice loDevice = new LoDevice(deviceId, deviceName, properties);
         entity = new HttpEntity<LoDevice>(loDevice, authenticationHeaders);
-        LOG.info(loDevice.toString());
+        LOG.debug("Device: " + loDevice.toString());
         ResponseEntity<String> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.POST, entity, String.class);
-        LOG.info(response.toString());
-        ObjectMapper om = new ObjectMapper();
-        try {
-            String writeValueAsString = om.writeValueAsString(loDevice);
-            System.out.println("***");
-            System.out.println(writeValueAsString);
-            System.out.println("***");
-            // {"id":"urn:lo:nsid:sensor:temp10","name":"temp10","platform":"kerlink"}
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        LOG.debug("Response: " + response.toString());
     }
 
     public void deleteDevice(String deviceId) {
