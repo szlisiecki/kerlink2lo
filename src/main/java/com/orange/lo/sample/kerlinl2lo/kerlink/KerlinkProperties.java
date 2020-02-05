@@ -10,6 +10,7 @@ public class KerlinkProperties {
 	private String baseUrl;
 	private String login;
 	private String password;
+	private int pageSize;
 	
 	public String getBaseUrl() {
 		return baseUrl;
@@ -28,5 +29,11 @@ public class KerlinkProperties {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
 	}
 }

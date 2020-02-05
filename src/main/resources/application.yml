@@ -3,6 +3,7 @@ spring:
     name: Lo2IotHub
     
 kerlink:
-  base-url: https://wmc-poc.wanesy.com/
+  base-url: https://wmc-poc.wanesy.com/gms
   login: szymon.lisiecki
   password: \65~R?8yv34u
+  page-size: 2
