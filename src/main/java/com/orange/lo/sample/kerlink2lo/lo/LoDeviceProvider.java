@@ -33,30 +33,30 @@ public class LoDeviceProvider {
         this.loProperties = loProperties;
         this.authenticationHeaders = authenticationHeaders;
         entity = new HttpEntity<>(authenticationHeaders);
-        url = loProperties.getDevicesUrl() +
-                "?limit=" + loProperties.getPageSize() +
-                "&offset=" + "%1$s" +
-                "&filterQuery=" + queriedField +
-                "." + loProperties.getPropertiesKey() +
-                "==" + loProperties.getPropertiesValue() +
-                "&fields=" + queriedField;
+        url = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s"
+                + "&filterQuery=" + queriedField + "." + loProperties.getPropertiesKey() + "=="
+                + loProperties.getPropertiesValue() + "&fields=" + queriedField;
     }
 
     public List<LoDevice> getAllDevices() {
-        ResponseEntity<LoDevice[]> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.GET, entity, LoDevice[].class);
+        ResponseEntity<LoDevice[]> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.GET,
+                entity, LoDevice[].class);
         return Arrays.asList(response.getBody());
     }
 
     public List<LoDevice> getDevices() {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
-        for (int offset = 0; ; offset++) {
-            ResponseEntity<LoDevice[]> response = restTemplate.exchange(getUrl(offset), HttpMethod.GET, entity, LoDevice[].class);
+        for (int offset = 0;; offset++) {
+            ResponseEntity<LoDevice[]> response = restTemplate.exchange(getUrl(offset), HttpMethod.GET, entity,
+                    LoDevice[].class);
             LOG.debug("Calling LO url {}, and got {} devices", getUrl(offset), response.getBody().length);
-            if (response.getBody().length == 0)
+            if (response.getBody().length == 0) {
                 break;
+            }
             devices.addAll(Arrays.asList(response.getBody()));
-            if (response.getBody().length < loProperties.getPageSize())
+            if (response.getBody().length < loProperties.getPageSize()) {
                 break;
+            }
         }
         LOG.debug("Devices: " + devices.toString());
         return devices;
@@ -65,13 +65,19 @@ public class LoDeviceProvider {
     public void addDevice(String deviceId, String deviceName, Map<String, String> properties) {
         LoDevice loDevice = new LoDevice(deviceId, deviceName, properties);
         entity = new HttpEntity<LoDevice>(loDevice, authenticationHeaders);
-        LOG.debug("Device: " + loDevice.toString());
-        ResponseEntity<String> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.POST, entity, String.class);
-        LOG.debug("Response: " + response.toString());
+        LOG.trace("Device: " + loDevice.toString());
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.POST,
+                    entity, String.class);
+            LOG.trace("Response: " + response.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void deleteDevice(String deviceId) {
-        ResponseEntity<String> response = restTemplate.exchange(loProperties.getDevicesUrl() + "/" + deviceId, HttpMethod.DELETE, entity, String.class);
+        restTemplate.exchange(loProperties.getDevicesUrl() + "/" + deviceId, HttpMethod.DELETE, entity, String.class);
     }
 
     private String getUrl(int offset) {

@@ -4,25 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LinkDto {
 
-  @JsonProperty("rel")
-  private String rel = null;
+    @JsonProperty("rel")
+    private String rel = null;
 
-  @JsonProperty("href")
-  private String href = null;
-  
-  public String getRel() {
-    return rel;
-  }
+    @JsonProperty("href")
+    private String href = null;
 
-  public void setRel(String rel) {
-    this.rel = rel;
-  }
+    public String getRel() {
+        return rel;
+    }
 
-  public String getHref() {
-    return href;
-  }
+    public void setRel(String rel) {
+        this.rel = rel;
+    }
 
-  public void setHref(String href) {
-    this.href = href;
-  }
+    public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
 }

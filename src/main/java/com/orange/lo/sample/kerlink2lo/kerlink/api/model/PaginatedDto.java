@@ -1,8 +1,7 @@
 package com.orange.lo.sample.kerlink2lo.kerlink.api.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * PaginatedDto
@@ -10,78 +9,80 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PaginatedDto<T> {
 
-  @JsonProperty("count")
-  private Integer count = null;
+    @JsonProperty("count")
+    private Integer count = null;
 
-  @JsonProperty("pageSize")
-  private Integer pageSize = null;
+    @JsonProperty("pageSize")
+    private Integer pageSize = null;
 
-  @JsonProperty("links")
-  private List<LinkDto> links = null;
+    @JsonProperty("links")
+    private List<LinkDto> links = null;
 
-  @JsonProperty("page")
-  private Integer page = null;
+    @JsonProperty("page")
+    private Integer page = null;
 
-  @JsonProperty("list")
-  private List<T> list = null;
+    @JsonProperty("list")
+    private List<T> list = null;
 
-  @JsonProperty("totalCount")
-  private Long totalCount = null;
+    @JsonProperty("totalCount")
+    private Long totalCount = null;
 
-  @JsonProperty("nbPages")
-  private Integer nbPages = null;
- 
-  public Integer getCount() {
-    return count;
-  }
-  public void setCount(Integer count) {
-    this.count = count;
-  }
- 
-  public Integer getPageSize() {
-    return pageSize;
-  }
-  
-  public void setPageSize(Integer pageSize) {
-    this.pageSize = pageSize;
-  }
-  
-  public List<LinkDto> getLinks() {
-    return links;
-  }
-  
-  public void setLinks(List<LinkDto> links) {
-    this.links = links;
-  }
-  
-  public Integer getPage() {
-    return page;
-  }
-  public void setPage(Integer page) {
-    this.page = page;
-  }
-  
-  public List<T> getList() {
-    return list;
-  }
-  
-  public void setList(List<T> list) {
-    this.list = list;
-  }
+    @JsonProperty("nbPages")
+    private Integer nbPages = null;
 
-  public Long getTotalCount() {
-    return totalCount;
-  }
+    public Integer getCount() {
+        return count;
+    }
 
-  public void setTotalCount(Long totalCount) {
-    this.totalCount = totalCount;
-  }
+    public void setCount(Integer count) {
+        this.count = count;
+    }
 
-  public Integer getNbPages() {
-    return nbPages;
-  }
+    public Integer getPageSize() {
+        return pageSize;
+    }
 
-  public void setNbPages(Integer nbPages) {
-    this.nbPages = nbPages;
-  }  
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public List<LinkDto> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<LinkDto> links) {
+        this.links = links;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    public List<T> getList() {
+        return list;
+    }
+
+    public void setList(List<T> list) {
+        this.list = list;
+    }
+
+    public Long getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public Integer getNbPages() {
+        return nbPages;
+    }
+
+    public void setNbPages(Integer nbPages) {
+        this.nbPages = nbPages;
+    }
 }

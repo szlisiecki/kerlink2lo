@@ -6,53 +6,64 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EndDeviceDto {
 
-	@JsonProperty("devAddr")
-	private String devAddr = null;
+    @JsonProperty("devAddr")
+    private String devAddr = null;
 
-	@JsonProperty("country")
-	private String country = null;
+    @JsonProperty("name")
+    private String name = null;
 
-	@JsonProperty("devEui")
-	private String devEui = null;
+    @JsonProperty("country")
+    private String country = null;
 
-	@JsonProperty("status")
-	private String status = null;
+    @JsonProperty("devEui")
+    private String devEui = null;
 
-	public String getDevAddr() {
-		return devAddr;
-	}
+    @JsonProperty("status")
+    private String status = null;
 
-	public void setDevAddr(String devAddr) {
-		this.devAddr = devAddr;
-	}
+    public String getDevAddr() {
+        return devAddr;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public void setDevAddr(String devAddr) {
+        this.devAddr = devAddr;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDevEui() {
-		return devEui;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setDevEui(String devEui) {
-		this.devEui = devEui;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getDevEui() {
+        return devEui;
+    }
 
-	@Override
-	public String toString() {
-		return "EndDeviceDto [devAddr=" + devAddr + ", country=" + country + ", devEui=" + devEui + ", status=" + status
-				+ "]";
-	}
+    public void setDevEui(String devEui) {
+        this.devEui = devEui;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "EndDeviceDto [devAddr=" + devAddr + ", country=" + country + ", devEui=" + devEui + ", status=" + status
+                + "]";
+    }
 }

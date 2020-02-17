@@ -12,14 +12,14 @@ public class LoDevice {
     private String id;
     private String name;
     private Map<String, String> properties;
-    
+
     @JsonCreator
-    public LoDevice(@JsonProperty("id")String id, @JsonProperty("name")String name, @JsonProperty("properties")Map<String, String> properties) {
-		this.id = id;
-		this.name = name;
-		this.properties = properties;
-	}
-    
+    public LoDevice(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("properties") Map<String, String> properties) {
+        this.id = id;
+        this.name = name;
+        this.properties = properties;
+    }
+
     public String getId() {
         return this.id;
     }
