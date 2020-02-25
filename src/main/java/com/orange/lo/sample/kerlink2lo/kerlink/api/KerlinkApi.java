@@ -68,7 +68,7 @@ public class KerlinkApi {
             ResponseEntity<JwtDto> responseEntity = restTemplate.postForEntity(url, userDto, JwtDto.class);
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 this.httpEntity = prepareHttpEntity("Bearer " + responseEntity.getBody().getToken());
-                this.token = responseEntity.getBody().getToken();
+                this.token = "Bearer " + responseEntity.getBody().getToken();
             } else {
                 LOG.error("Error while trying to login to Kerlink platform, returned status code is {}", responseEntity.getStatusCodeValue());
                 System.exit(1);
