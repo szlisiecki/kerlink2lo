@@ -8,8 +8,8 @@ public class DataDownDto {
     @JsonProperty("fPort")
     private Integer fPort = null;
 
-    @JsonProperty("endDeviceDto")
-    private EndDeviceDto endDeviceDto = null;
+    @JsonProperty("endDevice")
+    private EndDeviceDto endDevice = null;
 
     @JsonProperty("payload")
     private String payload = null;
@@ -18,7 +18,7 @@ public class DataDownDto {
     private String contentType = null;
 
     @JsonProperty("confirmed")
-    private String confirmed = null;
+    private Boolean confirmed = null;
 
     @JsonProperty("ttl")
     private Integer ttl = null;
@@ -34,12 +34,12 @@ public class DataDownDto {
         this.fPort = fPort;
     }
 
-    public EndDeviceDto getEndDeviceDto() {
-        return endDeviceDto;
+    public EndDeviceDto getEndDevice() {
+        return endDevice;
     }
 
-    public void setEndDeviceDto(EndDeviceDto endDeviceDto) {
-        this.endDeviceDto = endDeviceDto;
+    public void setEndDevice(EndDeviceDto endDevice) {
+        this.endDevice = endDevice;
     }
 
     public String getContentType() {
@@ -58,11 +58,11 @@ public class DataDownDto {
         this.payload = payload;
     }
 
-    public String getConfirmed() {
+    public Boolean getConfirmed() {
         return confirmed;
     }
 
-    public void setConfirmed(String confirmed) {
+    public void setConfirmed(Boolean confirmed) {
         this.confirmed = confirmed;
     }
 
@@ -80,5 +80,10 @@ public class DataDownDto {
 
     public void setMaxAttempts(Integer maxAttempts) {
         this.maxAttempts = maxAttempts;
+    }
+
+    @Override
+    public String toString() {
+        return "DataDownDto [fPort=" + fPort + ", endDevice=" + endDevice + ", payload=" + payload + ", contentType=" + contentType + "]";
     }
 }

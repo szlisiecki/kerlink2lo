@@ -17,8 +17,4 @@ public class Kerlink2LoApplication {
     public static void main(String[] args) {
         SpringApplication.run(Kerlink2LoApplication.class, args);
     }
-
-    @Bean
-    sendCommand();
-
 }
