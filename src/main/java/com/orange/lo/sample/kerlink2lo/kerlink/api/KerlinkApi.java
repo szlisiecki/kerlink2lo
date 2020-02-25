@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -66,6 +67,20 @@ public class KerlinkApi {
             LOG.error("Error while trying to login to Kerlink platform, ", e);
             System.exit(1);
         }
+        //sending a command to a device
+        LOG.info("Sending command...");
+        EndDeviceDto endDevice = new EndDeviceDto();
+        endDevice.setDevEui("0018B20000002345");
+        DataDownDto dataDownDto = new DataDownDto();
+        dataDownDto.setFPort(1);
+        dataDownDto.setEndDevice(endDevice);
+        dataDownDto.setPayload("FA");
+        dataDownDto.setContentType("HEXA");
+        dataDownDto.setConfirmed(true);
+        dataDownDto.setTtl(1000);
+        dataDownDto.setMaxAttempts(1);
+        LOG.info("Token: " + token);
+        sendCommand(dataDownDto);
     }
 
     public List<EndDeviceDto> getEndDevices() {
@@ -89,11 +104,11 @@ public class KerlinkApi {
         return devicesList;
     }
 
-    public void sendCommand(DataDownDto dataDownDto) {
+    public void sendCommand(@RequestBody DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
         try {
-            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
         } catch (Exception e) {
             LOG.error("Error while trying to send command to Kerlink device, ", e);
             System.exit(1);
@@ -112,7 +127,7 @@ public class KerlinkApi {
     private <T> HttpEntity<?> prepareHttpEntity(T t, String token) {
         //LOG.info("Token: " + token);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json,application/vnd.kerlink.iot-v1+json");
+        headers.set("Content-Type", "application/json");
         headers.set("Authorization", token);
         HttpEntity<?> httpEntity = new HttpEntity<>(t, headers);
         return httpEntity;
