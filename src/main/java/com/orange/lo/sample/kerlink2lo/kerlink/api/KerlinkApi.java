@@ -1,5 +1,7 @@
 package com.orange.lo.sample.kerlink2lo.kerlink.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.lo.sample.kerlink2lo.kerlink.KerlinkProperties;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.*;
 
@@ -22,6 +24,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -105,13 +108,25 @@ public class KerlinkApi {
     }
 
     public void sendCommand(@RequestBody DataDownDto dataDownDto) {
+        
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
         try {
+            ObjectMapper objectMapper = new ObjectMapper(); 
+            String payload = objectMapper.writeValueAsString(dataDownDto);
+            System.out.println("payload = " + payload);
+            System.out.println(httpEntity);
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
-        } catch (Exception e) {
+        } catch (HttpClientErrorException e) {
+            System.out.println("message : "+e.getMessage());
+            System.out.println("rawStatusCode : "+e.getRawStatusCode());
+            System.out.println("body : "+e.getResponseBodyAsString());
+            
             LOG.error("Error while trying to send command to Kerlink device, ", e);
             System.exit(1);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
