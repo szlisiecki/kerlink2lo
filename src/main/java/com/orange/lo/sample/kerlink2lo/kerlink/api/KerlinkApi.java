@@ -46,6 +46,7 @@ public class KerlinkApi {
 
     HttpEntity<Void> httpEntity;
     private String firstHref;
+    private String token;
 
     @Autowired
     public KerlinkApi(KerlinkProperties kerlinkProperties) {
@@ -61,14 +62,12 @@ public class KerlinkApi {
         UserDto userDto = new UserDto();
         userDto.setLogin(kerlinkProperties.getLogin());
         userDto.setPassword(kerlinkProperties.getPassword());
-
         String url = kerlinkProperties.getBaseUrl() + "/application/login";
-
         try {
             ResponseEntity<JwtDto> responseEntity = restTemplate.postForEntity(url, userDto, JwtDto.class);
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 this.httpEntity = prepareHttpEntity("Bearer " + responseEntity.getBody().getToken());
-                System.out.println("Bearer " + responseEntity.getBody().getToken());
+                this.token = responseEntity.getBody().getToken();
             } else {
                 LOG.error("Error while trying to login to Kerlink platform, returned status code is {}", responseEntity.getStatusCodeValue());
                 System.exit(1);
@@ -80,11 +79,8 @@ public class KerlinkApi {
     }
 
     public List<EndDeviceDto> getEndDevices() {
-
         ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {};
-
         List<EndDeviceDto> devicesList = new ArrayList<EndDeviceDto>();
-
         Optional<String> href = Optional.of(firstHref);
         while (href.isPresent()) {
             try {
@@ -103,11 +99,31 @@ public class KerlinkApi {
         return devicesList;
     }
 
+    public void sendCommand(DataDownDto dataDownDto) {
+        String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
+        HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
+        } catch (Exception e) {
+            LOG.error("Error while trying to send command to Kerlink device, ", e);
+            System.exit(1);
+        }
+    }
+
     private HttpEntity<Void> prepareHttpEntity(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json,application/vnd.kerlink.iot-v1+json");
         headers.set("Authorization", token);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+        return httpEntity;
+    }
+
+    private <T> HttpEntity<?> prepareHttpEntity(T t, String token) {
+        //LOG.info("Token: " + token);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json,application/vnd.kerlink.iot-v1+json");
+        headers.set("Authorization", token);
+        HttpEntity<?> httpEntity = new HttpEntity<>(t, headers);
         return httpEntity;
     }
 
