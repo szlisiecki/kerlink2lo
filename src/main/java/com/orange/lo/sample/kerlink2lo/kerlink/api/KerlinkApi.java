@@ -75,7 +75,7 @@ public class KerlinkApi {
         EndDeviceDto endDevice = new EndDeviceDto();
         endDevice.setDevEui("0018B20000002345");
         DataDownDto dataDownDto = new DataDownDto();
-        dataDownDto.setFPort(1);
+        dataDownDto.setfPort(1);
         dataDownDto.setEndDevice(endDevice);
         dataDownDto.setPayload("FA");
         dataDownDto.setContentType("HEXA");
@@ -83,7 +83,7 @@ public class KerlinkApi {
         dataDownDto.setTtl(1000);
         dataDownDto.setMaxAttempts(1);
         LOG.info("Token: " + token);
-        sendCommand(dataDownDto);
+        //sendCommand(dataDownDto);
     }
 
     public List<EndDeviceDto> getEndDevices() {
@@ -107,8 +107,7 @@ public class KerlinkApi {
         return devicesList;
     }
 
-    public void sendCommand(@RequestBody DataDownDto dataDownDto) {
-        
+    public void sendCommand(DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
         try {
@@ -121,7 +120,6 @@ public class KerlinkApi {
             System.out.println("message : "+e.getMessage());
             System.out.println("rawStatusCode : "+e.getRawStatusCode());
             System.out.println("body : "+e.getResponseBodyAsString());
-            
             LOG.error("Error while trying to send command to Kerlink device, ", e);
             System.exit(1);
         } catch (JsonProcessingException e) {

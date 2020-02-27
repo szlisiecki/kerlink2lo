@@ -26,11 +26,11 @@ public class DataDownDto {
     @JsonProperty("maxAttempts")
     private Integer maxAttempts = null;
 
-    public Integer getFPort() {
+    public Integer getfPort() {
         return fPort;
     }
 
-    public void setFPort(Integer fPort) {
+    public void setfPort(Integer fPort) {
         this.fPort = fPort;
     }
 
