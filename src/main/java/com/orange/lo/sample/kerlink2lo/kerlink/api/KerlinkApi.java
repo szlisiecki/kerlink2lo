@@ -1,3 +1,10 @@
+/** 
+* Copyright (c) Orange. All Rights Reserved.
+* 
+* This source code is licensed under the MIT license found in the 
+* LICENSE file in the root directory of this source tree. 
+*/
+
 package com.orange.lo.sample.kerlink2lo.kerlink.api;
 
 import com.orange.lo.sample.kerlink2lo.kerlink.KerlinkProperties;
@@ -44,8 +51,7 @@ public class KerlinkApi {
     public KerlinkApi(KerlinkProperties kerlinkProperties) {
         this.kerlinkProperties = kerlinkProperties;
         this.restTemplate = prepareRestTemplate();
-        this.firstHref = "/application/endDevices?fields=devEui,devAddr,name,country,status&sort=%2BdevEui&page=1&pageSize="
-                + kerlinkProperties.getPageSize();
+        this.firstHref = "/application/endDevices?fields=devEui,devAddr,name,country,status&sort=%2BdevEui&page=1&pageSize=" + kerlinkProperties.getPageSize();
         this.login();
     }
 
@@ -62,6 +68,7 @@ public class KerlinkApi {
             ResponseEntity<JwtDto> responseEntity = restTemplate.postForEntity(url, userDto, JwtDto.class);
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 this.httpEntity = prepareHttpEntity("Bearer " + responseEntity.getBody().getToken());
+                System.out.println("Bearer " + responseEntity.getBody().getToken());
             } else {
                 LOG.error("Error while trying to login to Kerlink platform, returned status code is {}", responseEntity.getStatusCodeValue());
                 System.exit(1);
@@ -74,8 +81,7 @@ public class KerlinkApi {
 
     public List<EndDeviceDto> getEndDevices() {
 
-        ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {
-        };
+        ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {};
 
         List<EndDeviceDto> devicesList = new ArrayList<EndDeviceDto>();
 
@@ -86,7 +92,7 @@ public class KerlinkApi {
                 ResponseEntity<PaginatedDto<EndDeviceDto>> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
                         httpEntity, returnType);
                 PaginatedDto<EndDeviceDto> body = responseEntity.getBody();
-                LOG.debug("Calling kerlink url {}, and got {} devices", url, body.getList().size());
+                LOG.trace("Calling kerlink url {}, and got {} devices", url, body.getList().size());
                 devicesList.addAll(body.getList());
                 href = getNextPageHref(body.getLinks());
             } catch (Exception e) {

@@ -1,3 +1,5 @@
+server:
+  port: 48080
 spring:
   application:
     name: Lo2IotHub
@@ -6,13 +8,20 @@ kerlink:
   base-url: https://wmc-poc.wanesy.com/gms
   login: szymon.lisiecki
   password: \65~R?8yv34u
-  page-size: 2
+  page-size: 20
   
 lo:
   api-key: 7eccf568340943278c0495654b5de320
   devices-url: https://liveobjects.orange-business.com/api/v1/deviceMgt/devices
+  connector-api-key: 6fd77ec40dda4936be4d6f77174bdfe1
+  connector-user: connector
+  connector-mqtt-url: ssl://liveobjects.orange-business.com:8883
   synchronization-device-interval: 10000
   synchronization-thread-pool-size: 40
-  page-size: 1
+  page-size: 20
   properties-key: platform
   properties-value: kerlink
+  
+  message-sender-max-thread-pool-size: 100
+  message-sender-min-thread-pool-size: 10
+  message-qos: 1
