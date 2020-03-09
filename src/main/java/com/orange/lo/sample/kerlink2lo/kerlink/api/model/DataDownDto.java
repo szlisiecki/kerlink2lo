@@ -3,28 +3,20 @@ package com.orange.lo.sample.kerlink2lo.kerlink.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class DataDownDto {
-    @JsonProperty("fPort")
-    private Integer fPort = null;
+@JsonIgnoreProperties(ignoreUnknown = true) public class DataDownDto {
+    @JsonProperty("fPort") private Integer fPort = null;
 
-    @JsonProperty("endDevice")
-    private EndDeviceDto endDevice = null;
+    @JsonProperty("endDevice") private EndDeviceDto endDevice = null;
 
-    @JsonProperty("payload")
-    private String payload = null;
+    @JsonProperty("payload") private String payload = null;
 
-    @JsonProperty("contentType")
-    private String contentType = null;
+    @JsonProperty("contentType") private String contentType = null;
 
-    @JsonProperty("confirmed")
-    private Boolean confirmed = null;
+    @JsonProperty("confirmed") private Boolean confirmed = null;
 
-    @JsonProperty("ttl")
-    private Integer ttl = null;
+    @JsonProperty("ttl") private Integer ttl = null;
 
-    @JsonProperty("maxAttempts")
-    private Integer maxAttempts = null;
+    @JsonProperty("maxAttempts") private Integer maxAttempts = null;
 
     public Integer getfPort() {
         return fPort;
@@ -82,8 +74,7 @@ public class DataDownDto {
         this.maxAttempts = maxAttempts;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "DataDownDto [fPort=" + fPort + ", endDevice=" + endDevice + ", payload=" + payload + ", contentType=" + contentType + "]";
     }
 }
