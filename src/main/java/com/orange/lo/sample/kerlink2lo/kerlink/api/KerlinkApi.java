@@ -97,14 +97,14 @@ public class KerlinkApi {
     }
 
     public List<EndDeviceDto> getEndDevices() {
-        ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {};
+        ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {
+        };
         List<EndDeviceDto> devicesList = new ArrayList<EndDeviceDto>();
         Optional<String> href = Optional.of(firstHref);
         while (href.isPresent()) {
             try {
                 String url = kerlinkProperties.getBaseUrl() + href.get();
-                ResponseEntity<PaginatedDto<EndDeviceDto>> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
-                        httpEntity, returnType);
+                ResponseEntity<PaginatedDto<EndDeviceDto>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, returnType);
                 PaginatedDto<EndDeviceDto> body = responseEntity.getBody();
                 LOG.trace("Calling kerlink url {}, and got {} devices", url, body.getList().size());
                 devicesList.addAll(body.getList());
@@ -121,7 +121,7 @@ public class KerlinkApi {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
         try {
-            ObjectMapper objectMapper = new ObjectMapper(); 
+            ObjectMapper objectMapper = new ObjectMapper();
             String payload = objectMapper.writeValueAsString(dataDownDto);
             System.out.println("payload = " + payload);
             System.out.println(httpEntity);
