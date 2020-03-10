@@ -100,12 +100,11 @@ public class KerlinkApi {
 
     public void sendCommand(DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
-        HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
+        HttpEntity<DataDownDto> httpEntity = prepareHttpEntity(token, dataDownDto);
         try {
             restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
         } catch (HttpClientErrorException e) {
             LOG.error("Error while trying to send command to Kerlink device, ", e);
-            System.exit(1);
         }
     }
 
@@ -117,11 +116,11 @@ public class KerlinkApi {
         return httpEntity;
     }
 
-    private <T> HttpEntity<?> prepareHttpEntity(T t, String token) {
+    private <T> HttpEntity<T> prepareHttpEntity(String token, T t) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", token);
-        HttpEntity<?> httpEntity = new HttpEntity<>(t, headers);
+        HttpEntity<T> httpEntity = new HttpEntity<>(t, headers);
         return httpEntity;
     }
 
