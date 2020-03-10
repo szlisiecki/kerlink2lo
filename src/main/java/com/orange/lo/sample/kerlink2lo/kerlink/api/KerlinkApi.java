@@ -1,9 +1,12 @@
 package com.orange.lo.sample.kerlink2lo.kerlink.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.lo.sample.kerlink2lo.kerlink.KerlinkProperties;
-import com.orange.lo.sample.kerlink2lo.kerlink.api.model.*;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.EndDeviceDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.JwtDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.LinkDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.PaginatedDto;
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.UserDto;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -93,7 +96,7 @@ public class KerlinkApi {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
         try {
-            ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
+            restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
         } catch (HttpClientErrorException e) {
             LOG.error("Error while trying to send command to Kerlink device, ", e);
             System.exit(1);

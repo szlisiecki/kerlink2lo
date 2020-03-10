@@ -3,7 +3,8 @@ package com.orange.lo.sample.kerlink2lo.kerlink.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true) public class DataDownDto {
+@JsonIgnoreProperties(ignoreUnknown = true) 
+public class DataDownDto {
     @JsonProperty("fPort") private Integer fPort = null;
 
     @JsonProperty("endDevice") private EndDeviceDto endDevice = null;
