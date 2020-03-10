@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -33,10 +32,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 public class KerlinkApi {
 
     private static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private RestTemplate restTemplate;
     private KerlinkProperties kerlinkProperties;
-
     HttpEntity<Void> httpEntity;
     private String firstHref;
     private String token;
@@ -70,25 +67,10 @@ public class KerlinkApi {
             LOG.error("Error while trying to login to Kerlink platform, ", e);
             System.exit(1);
         }
-        //sending a command to a device
-        LOG.info("Sending command...");
-        EndDeviceDto endDevice = new EndDeviceDto();
-        endDevice.setDevEui("0018B20000002345");
-        DataDownDto dataDownDto = new DataDownDto();
-        dataDownDto.setfPort(1);
-        dataDownDto.setEndDevice(endDevice);
-        dataDownDto.setPayload("FA");
-        dataDownDto.setContentType("HEXA");
-        dataDownDto.setConfirmed(true);
-        dataDownDto.setTtl(1000);
-        dataDownDto.setMaxAttempts(1);
-        LOG.info("Token: " + token);
-        //sendCommand(dataDownDto);
     }
 
     public List<EndDeviceDto> getEndDevices() {
-        ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {
-        };
+        ParameterizedTypeReference<PaginatedDto<EndDeviceDto>> returnType = new ParameterizedTypeReference<PaginatedDto<EndDeviceDto>>() {};
         List<EndDeviceDto> devicesList = new ArrayList<EndDeviceDto>();
         Optional<String> href = Optional.of(firstHref);
         while (href.isPresent()) {
@@ -111,25 +93,14 @@ public class KerlinkApi {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<?> httpEntity = prepareHttpEntity(dataDownDto, token);
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String payload = objectMapper.writeValueAsString(dataDownDto);
-            System.out.println("payload = " + payload);
-            System.out.println(httpEntity);
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
         } catch (HttpClientErrorException e) {
-            System.out.println("message : "+e.getMessage());
-            System.out.println("rawStatusCode : "+e.getRawStatusCode());
-            System.out.println("body : "+e.getResponseBodyAsString());
             LOG.error("Error while trying to send command to Kerlink device, ", e);
             System.exit(1);
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 
     private HttpEntity<Void> prepareHttpEntity(String token) {
-        //LOG.info("Token: " + token);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json,application/vnd.kerlink.iot-v1+json");
         headers.set("Authorization", token);
@@ -138,7 +109,6 @@ public class KerlinkApi {
     }
 
     private <T> HttpEntity<?> prepareHttpEntity(T t, String token) {
-        //LOG.info("Token: " + token);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", token);
