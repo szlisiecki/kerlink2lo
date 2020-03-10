@@ -8,10 +8,7 @@
 package com.orange.lo.sample.kerlink2lo.kerlink.api;
 
 import com.orange.lo.sample.kerlink2lo.kerlink.KerlinkProperties;
-<<<<<<< Upstream, based on origin/master
-=======
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownDto;
->>>>>>> 66ba248 clean code
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.EndDeviceDto;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.JwtDto;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.LinkDto;
