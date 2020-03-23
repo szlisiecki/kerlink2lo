@@ -49,7 +49,9 @@ public class LoDeviceProvider {
         this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         this.authenticationEntity = new HttpEntity<Void>(authenticationHeaders);
         this.updatePropertiesHttpEntity = getUpdateHttpEntity();
-        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&filterQuery=" + PROPERTIES_FIELD + "." + loProperties.getPropertiesKey() + "==" + loProperties.getPropertiesValue() + "&fields=" + PROPERTIES_FIELD;
+        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() +
+                "&offset=" + "%1$s" + "&filterQuery=" + PROPERTIES_FIELD + "." +
+                loProperties.getPropertiesKey() + "==" + loProperties.getPropertiesValue() + "&fields=" + PROPERTIES_FIELD;
     }
 
     public List<LoDevice> getAllDevices() {
@@ -63,14 +65,18 @@ public class LoDeviceProvider {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
         for (int offset = 0;; offset++) {
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getpagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
+            //if (headers.get("X-Result-Count").get(0))
             LOG.debug("Calling LO url {}, and got {} devices", getpagedDevicesUrl(offset), response.getBody().length);
+            HttpHeaders headers = response.getHeaders();
+            LOG.debug("Count: " + headers.get("X-Result-Count").get(0).toString());
             if (response.getBody().length == 0) {
                 break;
             }
             devices.addAll(Arrays.asList(response.getBody()));
-            if (response.getBody().length < loProperties.getPageSize()) {
+            if (devices.size() >= Integer.parseInt(headers.get("X-Result-Count").get(0))) {
                 break;
             }
+
         }
         LOG.trace("Devices: " + devices.toString());
         return devices;

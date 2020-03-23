@@ -18,7 +18,7 @@ lo:
   connector-mqtt-url: ssl://liveobjects.orange-business.com:8883
   synchronization-device-interval: 10000
   synchronization-thread-pool-size: 40
-  page-size: 20
+  page-size: 2
   properties-key: platform
   properties-value: kerlink
   
