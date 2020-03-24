@@ -75,7 +75,11 @@ public class ExternalConnector {
         convertPayload(dataUpDto);
         
         dataMessage.setValue(dataUpDto);
-        dataMessage.setMetadata(new Metadata("twointegers"));
+        
+        String messageDecoder = loProperties.getMessageDecoder();
+        if (messageDecoder != null && !messageDecoder.isEmpty()) {
+            dataMessage.setMetadata(new Metadata(messageDecoder));            
+        }
         
         MqttMessage msg = prepareMqttMessgae(dataMessage);
         String topic = String.format(DATA_TOPIC_TEMPLATE, dataUpDto.getEndDevice().getDevEui());
