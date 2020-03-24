@@ -7,6 +7,7 @@
 
 package com.orange.lo.sample.kerlink2lo.lo;
 
+import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownEventDto;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataUpDto;
 
 import java.lang.invoke.MethodHandles;
@@ -20,7 +21,6 @@ public class ExternalConnectorService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     
-    private static final String LO_DEVICE_ID_PREFIX = "urn:lo:nsid:x-connector:";
     private ExternalConnector externalConnector;
     private LoDeviceProvider loDeviceProvider;
     
@@ -32,20 +32,20 @@ public class ExternalConnectorService {
     //TODO add cache for devices
     public void sendMessage(DataUpDto dataUpDto) {
         try {
-            externalConnector.sendMessage(dataUpDto);
-            externalConnector.sendStatus(dataUpDto.getEndDevice().getDevEui());
-            waitFor(2000);
-            loDeviceProvider.updateDeviceProperties(LO_DEVICE_ID_PREFIX + dataUpDto.getEndDevice().getDevEui());            
+            externalConnector.sendMessage(dataUpDto);            
         } catch (Exception e) {
             LOG.error("Unable to send message",e);
         }
     }
     
+    public void sendCommandResponse(DataDownEventDto dataDownEventDto) {
+        externalConnector.sendCommandResponse(dataDownEventDto);
+    }
+    
     public void createDevice(String kerlinkDeviceId) {
         try {
-            externalConnector.sendStatus(kerlinkDeviceId);
-            waitFor(2000);
-            loDeviceProvider.updateDeviceProperties(LO_DEVICE_ID_PREFIX + kerlinkDeviceId);            
+            loDeviceProvider.addDevice(kerlinkDeviceId);
+            externalConnector.sendStatus(kerlinkDeviceId);            
         } catch (Exception e) {
             LOG.error("Unable to create device",e);
         }
@@ -57,9 +57,5 @@ public class ExternalConnectorService {
         } catch (Exception e) {
             LOG.error("Unable to delete device",e);
         }
-    }
-    
-    private void waitFor(long millis) throws InterruptedException {
-        Thread.sleep(millis);
     }
 }

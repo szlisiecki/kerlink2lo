@@ -75,7 +75,12 @@ public class DataDownDto {
         this.maxAttempts = maxAttempts;
     }
 
-    @Override public String toString() {
-        return "DataDownDto [fPort=" + fPort + ", endDevice=" + endDevice + ", payload=" + payload + ", contentType=" + contentType + "]";
+    @Override
+    public String toString() {
+        return "DataDownDto [fPort=" + fPort + ", endDevice=" + endDevice + ", payload=" + payload + ", contentType=" + contentType + ", confirmed=" + confirmed + ", ttl=" + ttl + ", maxAttempts=" + maxAttempts + "]";
     }
+
+//    @Override public String toString() {
+//        return "DataDownDto [fPort=" + fPort + ", endDevice=" + endDevice + ", payload=" + payload + ", contentType=" + contentType + "]";
+//    }
 }

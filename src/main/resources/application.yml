@@ -21,6 +21,8 @@ lo:
   page-size: 20
   properties-key: platform
   properties-value: kerlink
+  device-group-id: 7Zd4tB
+  device-prefix: 'urn:lo:nsid:x-connector:'
   
   message-sender-max-thread-pool-size: 100
   message-sender-min-thread-pool-size: 10

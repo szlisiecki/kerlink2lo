@@ -21,6 +21,8 @@ public class DataMessage {
     private String model = null;
 
     private DataUpDto value = null;
+    
+    private Metadata metadata = null;
 
     private String location = null;
 
@@ -72,5 +74,13 @@ public class DataMessage {
 
     public void setValue(DataUpDto value) {
         this.value = value;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 }

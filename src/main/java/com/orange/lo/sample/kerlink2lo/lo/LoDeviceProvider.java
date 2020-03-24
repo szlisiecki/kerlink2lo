@@ -7,16 +7,10 @@
 
 package com.orange.lo.sample.kerlink2lo.lo;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +32,6 @@ public class LoDeviceProvider {
     private LoProperties loProperties;
     private HttpHeaders authenticationHeaders;
     private HttpEntity<Void> authenticationEntity;
-    private HttpEntity<ObjectNode> updatePropertiesHttpEntity;
     private final String DEVICES_PAGED_URL_TEMPLATE;
    
     @Autowired
@@ -48,22 +41,17 @@ public class LoDeviceProvider {
         
         this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         this.authenticationEntity = new HttpEntity<Void>(authenticationHeaders);
-        this.updatePropertiesHttpEntity = getUpdateHttpEntity();
-        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&filterQuery=" + PROPERTIES_FIELD + "." + loProperties.getPropertiesKey() + "==" + loProperties.getPropertiesValue() + "&fields=" + PROPERTIES_FIELD;
-    }
-
-    public List<LoDevice> getAllDevices() {
-        ResponseEntity<LoDevice[]> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-        return Arrays.asList(response.getBody());
+        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&groupId=" + loProperties.getDeviceGroupId() + "&fields=" + PROPERTIES_FIELD;
     }
 
     //TODO use x-total-count
     //TODO use x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
     public List<LoDevice> getDevices() {
+        LOG.trace("Trying to get devices from LO");
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
         for (int offset = 0;; offset++) {
-            ResponseEntity<LoDevice[]> response = restTemplate.exchange(getpagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-            LOG.debug("Calling LO url {}, and got {} devices", getpagedDevicesUrl(offset), response.getBody().length);
+            ResponseEntity<LoDevice[]> response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
+            LOG.debug("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
             if (response.getBody().length == 0) {
                 break;
             }
@@ -75,41 +63,22 @@ public class LoDeviceProvider {
         LOG.trace("Devices: " + devices.toString());
         return devices;
     }
-
-    @Deprecated
-    public void addDevice(String deviceId, String deviceName, Map<String, String> properties) {
-        LoDevice loDevice = new LoDevice(deviceId, deviceName, properties);
-        HttpEntity<LoDevice> httpEntity = new HttpEntity<LoDevice>(loDevice, authenticationHeaders);
-        LOG.trace("Device: " + loDevice.toString());
-        try {
-            ResponseEntity<Void> response = restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.POST, httpEntity, Void.class);
-            LOG.trace("Response: " + response.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void updateDeviceProperties(String deviceId) {
-        String url = loProperties.getDevicesUrl() + "/" + deviceId;
-        restTemplate.exchange(url, HttpMethod.PATCH, updatePropertiesHttpEntity, Void.class);
-    }
-
-    private HttpEntity<ObjectNode> getUpdateHttpEntity() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> deviceProperties = Collections.singletonMap(loProperties.getPropertiesKey(), loProperties.getPropertiesValue());
-        ObjectNode propertiesRootNode = objectMapper.createObjectNode();
-        JsonNode devicePropertiesJsonNode = objectMapper.valueToTree(deviceProperties);
-        propertiesRootNode.set(PROPERTIES_FIELD, devicePropertiesJsonNode);
-        HttpEntity<ObjectNode> httpEntity = new HttpEntity<ObjectNode>(propertiesRootNode, authenticationHeaders);
-        return httpEntity;
+    
+    public void addDevice(String deviceId) {
+        LOG.trace("Trying to add device {} to LO", deviceId);
+        
+        LoDevice device = new LoDevice(deviceId, loProperties.getDeviceGroupId(), loProperties.getDevicePrefix(), true);
+        HttpEntity<LoDevice> httpEntity = new HttpEntity<LoDevice>(device, authenticationHeaders);
+        
+        restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.POST, httpEntity, Void.class);
     }
 
     public void deleteDevice(String deviceId) {
+        LOG.trace("Trying to delete device {} from LO", deviceId);
         restTemplate.exchange(loProperties.getDevicesUrl() + "/" + deviceId, HttpMethod.DELETE, authenticationEntity, Void.class);
     }
 
-    private String getpagedDevicesUrl(int offset) {
+    private String getPagedDevicesUrl(int offset) {
         return String.format(DEVICES_PAGED_URL_TEMPLATE, offset * loProperties.getPageSize());
     }
 }

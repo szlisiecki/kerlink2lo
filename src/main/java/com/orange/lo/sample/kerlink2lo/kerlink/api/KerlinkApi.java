@@ -68,6 +68,7 @@ public class KerlinkApi {
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 this.httpEntity = prepareHttpEntity("Bearer " + responseEntity.getBody().getToken());
                 this.token = "Bearer " + responseEntity.getBody().getToken();
+                LOG.debug("Kerlink Token: {}",this.token);
             } else {
                 LOG.error("Error while trying to login to Kerlink platform, returned status code is {}", responseEntity.getStatusCodeValue());
                 System.exit(1);
@@ -98,13 +99,16 @@ public class KerlinkApi {
         return devicesList;
     }
 
-    public void sendCommand(DataDownDto dataDownDto) {
+    public Optional<String> sendCommand(DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<DataDownDto> httpEntity = prepareHttpEntity(token, dataDownDto);
         try {
-            restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
+            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
+            String commandId = response.getHeaders().getLocation().getPath().substring(22);
+            return Optional.of(commandId);
         } catch (HttpClientErrorException e) {
             LOG.error("Error while trying to send command to Kerlink device, ", e);
+            return Optional.empty();
         }
     }
 
