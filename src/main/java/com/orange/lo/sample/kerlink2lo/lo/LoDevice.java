@@ -7,44 +7,63 @@
 
 package com.orange.lo.sample.kerlink2lo.lo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.orange.lo.sample.kerlink2lo.lo.model.NodeStatus.Capabilities;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoDevice {
 
     private String id;
     private String name;
-    private Map<String, String> properties;
-
-    @JsonCreator
-    public LoDevice(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("properties") Map<String, String> properties) {
-        this.id = id;
-        this.name = name;
-        this.properties = properties;
+    private LoGroup group;
+    private List<LoInterface> interfaces;    
+    
+    public LoDevice() {}
+    
+    public LoDevice(String id, String groupId, String prefix, boolean commandAvailable) {
+        this.id = prefix + id;
+        this.name = id;
+        this.group = new LoGroup(groupId);
+        
+        LoInterface loInterface = new LoInterface(); 
+        loInterface.setConnector("x-connector");
+        loInterface.setDefinition(new Definition(id));
+        loInterface.setCapabilities(new Capabilities(true));
+        this.interfaces = Collections.singletonList(loInterface);        
     }
-
+    
     public String getId() {
-        return this.id;
+        return id;
     }
-
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     public String getName() {
         return name;
     }
-
-    public Map<String, String> getProperties() {
-        return properties;
+    
+    public void setName(String name) {
+        this.name = name;
     }
-
-    @Override
-    public String toString() {
-        StringBuilder propertiesString = new StringBuilder();
-        properties.forEach((key, value) -> {
-            propertiesString.append(key).append(" ").append(value).toString();
-        });
-        return "Lo Device [id: " + id + "; name: " + name + "; properties: " + propertiesString + "]";
+    
+    public LoGroup getGroup() {
+        return group;
+    }
+    
+    public void setGroup(LoGroup group) {
+        this.group = group;
+    }
+    
+    public List<LoInterface> getInterfaces() {
+        return interfaces;
+    }
+    
+    public void setInterfaces(List<LoInterface> interfaces) {
+        this.interfaces = interfaces;
     }
 }

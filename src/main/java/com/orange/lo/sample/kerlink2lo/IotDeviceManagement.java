@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 public class IotDeviceManagement {
 
     private static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String LO_DEVICE_ID_PREFIX = "urn:lo:nsid:x-connector:";
     
     private LoProperties loProperties;
     private KerlinkApi kerlinkApi;
@@ -57,12 +56,12 @@ public class IotDeviceManagement {
         
         // add devices to LO
         Set<String> devicesToAddToLo = new HashSet<String>(kerlinkIds);
-        devicesToAddToLo.removeAll(loIds.stream().map(loId -> loId.substring(LO_DEVICE_ID_PREFIX.length())).collect(Collectors.toSet()));   
+        devicesToAddToLo.removeAll(loIds.stream().map(loId -> loId.substring(loProperties.getDevicePrefix().length())).collect(Collectors.toSet()));   
         LOG.debug("Devices to add to LO: {}", devicesToAddToLo.toString());
         
         // remove devices from LO
         Set<String> devicesToRemoveFromLo = new HashSet<String>(loIds);
-        devicesToRemoveFromLo.removeAll(kerlinkIds.stream().map(kerlinkId -> LO_DEVICE_ID_PREFIX + kerlinkId).collect(Collectors.toSet()));
+        devicesToRemoveFromLo.removeAll(kerlinkIds.stream().map(kerlinkId -> loProperties.getDevicePrefix() + kerlinkId).collect(Collectors.toSet()));
         LOG.debug("Devices to remove from LO: {}", devicesToRemoveFromLo.toString());
         
         if (devicesToAddToLo.size() + devicesToRemoveFromLo.size() > 0) {
