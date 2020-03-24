@@ -28,6 +28,7 @@ public class LoProperties {
     private String connectorMqttUrl;
     private String deviceGroupId;
     private String devicePrefix;
+    private String messageDecoder;
     
     public String getApiKey() {
         return apiKey;
@@ -139,5 +140,13 @@ public class LoProperties {
 
     public void setDevicePrefix(String devicePrefix) {
         this.devicePrefix = devicePrefix;
+    }
+
+    public String getMessageDecoder() {
+        return messageDecoder;
+    }
+
+    public void setMessageDecoder(String messageDecoder) {
+        this.messageDecoder = messageDecoder;
     }
 }
