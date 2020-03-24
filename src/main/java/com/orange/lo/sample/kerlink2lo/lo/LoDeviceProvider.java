@@ -10,6 +10,7 @@ package com.orange.lo.sample.kerlink2lo.lo;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -44,19 +45,23 @@ public class LoDeviceProvider {
         this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&groupId=" + loProperties.getDeviceGroupId() + "&fields=" + PROPERTIES_FIELD;
     }
 
-    //TODO use x-total-count
-    //TODO use x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
-    public List<LoDevice> getDevices() {
-        LOG.trace("Trying to get devices from LO");
+    public List<LoDevice> getDevices() throws InterruptedException {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
+        Date date= new Date();
         for (int offset = 0;; offset++) {
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
+            if (Integer.parseInt(response.getHeaders().get("X-Ratelimit-Remaining").get(0)) == 0) {
+                long reset = Long.parseLong(response.getHeaders().get("X-Ratelimit-Reset").get(0));
+                long current = date.getTime();
+                Thread.sleep(reset - current);
+                response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
+            }
             LOG.debug("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
             if (response.getBody().length == 0) {
                 break;
             }
             devices.addAll(Arrays.asList(response.getBody()));
-            if (response.getBody().length < loProperties.getPageSize()) {
+            if (devices.size() >= Integer.parseInt(response.getHeaders().get("X-Total-Count").get(0))) {
                 break;
             }
         }
