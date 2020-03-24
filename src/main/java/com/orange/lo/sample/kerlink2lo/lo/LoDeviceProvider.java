@@ -12,11 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,22 +57,26 @@ public class LoDeviceProvider {
 
     //TODO use x-total-count
     //TODO use x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
-    public List<LoDevice> getDevices() {
+    public List<LoDevice> getDevices() throws InterruptedException {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
+        Date date= new Date();
         for (int offset = 0;; offset++) {
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getpagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-            //if (headers.get("X-Result-Count").get(0))
+            if (Integer.parseInt(response.getHeaders().get("X-Ratelimit-Remaining").get(0)) == 0) {
+                long reset = Long.parseLong(response.getHeaders().get("X-Ratelimit-Reset").get(0));
+                long current = date.getTime();
+                long diff = reset - current;
+                Thread.sleep(reset - current);
+                response = restTemplate.exchange(getpagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
+            }
             LOG.debug("Calling LO url {}, and got {} devices", getpagedDevicesUrl(offset), response.getBody().length);
-            HttpHeaders headers = response.getHeaders();
-            LOG.debug("Count: " + headers.get("X-Result-Count").get(0).toString());
             if (response.getBody().length == 0) {
                 break;
             }
             devices.addAll(Arrays.asList(response.getBody()));
-            if (devices.size() >= Integer.parseInt(headers.get("X-Result-Count").get(0))) {
+            if (devices.size() >= Integer.parseInt(response.getHeaders().get("X-Total-Count").get(0))) {
                 break;
             }
-
         }
         LOG.trace("Devices: " + devices.toString());
         return devices;
