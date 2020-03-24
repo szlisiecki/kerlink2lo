@@ -34,6 +34,10 @@ public class LoDeviceProvider {
     private HttpHeaders authenticationHeaders;
     private HttpEntity<Void> authenticationEntity;
     private final String DEVICES_PAGED_URL_TEMPLATE;
+
+    private String xTotalCountHeader = "X-Total-Count";
+    private String xRatelimitRemainingHeader = "X-Ratelimit-Remaining";
+    private String xRatelimitResetHeader = "X-Ratelimit-Reset";
    
     @Autowired
     public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders) {
@@ -45,24 +49,26 @@ public class LoDeviceProvider {
         this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&groupId=" + loProperties.getDeviceGroupId() + "&fields=" + PROPERTIES_FIELD;
     }
 
-    public List<LoDevice> getDevices() throws InterruptedException {
+    public List<LoDevice> getDevices() {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
-        Date date= new Date();
+
         for (int offset = 0;; offset++) {
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-            if (Integer.parseInt(response.getHeaders().get("X-Ratelimit-Remaining").get(0)) == 0) {
-                long reset = Long.parseLong(response.getHeaders().get("X-Ratelimit-Reset").get(0));
-                long current = date.getTime();
-                Thread.sleep(reset - current);
-                response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-            }
-            LOG.debug("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
+            LOG.trace("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
             if (response.getBody().length == 0) {
                 break;
             }
             devices.addAll(Arrays.asList(response.getBody()));
-            if (devices.size() >= Integer.parseInt(response.getHeaders().get("X-Total-Count").get(0))) {
+            if (devices.size() >= Integer.parseInt(response.getHeaders().get(xTotalCountHeader).get(0))) {
                 break;
+            }
+            if (Integer.parseInt(response.getHeaders().get(xRatelimitRemainingHeader).get(0)) == 0) {
+                long reset = Long.parseLong(response.getHeaders().get(xRatelimitResetHeader).get(0));
+                try {
+                    Thread.sleep(reset - new Date().getTime());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         LOG.trace("Devices: " + devices.toString());
