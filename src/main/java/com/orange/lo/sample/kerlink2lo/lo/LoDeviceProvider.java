@@ -64,8 +64,9 @@ public class LoDeviceProvider {
             }
             if (Integer.parseInt(response.getHeaders().get(xRatelimitRemainingHeader).get(0)) == 0) {
                 long reset = Long.parseLong(response.getHeaders().get(xRatelimitResetHeader).get(0));
+                long current = new Date().getTime();
                 try {
-                    Thread.sleep(reset - new Date().getTime());
+                    Thread.sleep(reset - current);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
