@@ -61,7 +61,7 @@ public class LoDeviceProvider {
             if (devices.size() >= Integer.parseInt(response.getHeaders().get(xTotalCountHeader).get(0))) {
                 break;
             }
-            if (Integer.parseInt(response.getHeaders().get(xRatelimitRemainingHeader).get(0)) <25) {
+            if (Integer.parseInt(response.getHeaders().get(xRatelimitRemainingHeader).get(0)) == 0) {
                 long reset = Long.parseLong(response.getHeaders().get(xRatelimitResetHeader).get(0));
                 long current = System.currentTimeMillis();
                 try {
