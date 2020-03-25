@@ -1,9 +1,9 @@
 package com.orange.lo.sample.kerlink2lo.lo;
 
+import java.util.Base64;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-
-import java.util.Base64;
 
 public class PayloadCodec {
 

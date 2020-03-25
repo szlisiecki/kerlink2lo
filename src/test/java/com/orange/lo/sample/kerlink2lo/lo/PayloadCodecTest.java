@@ -1,11 +1,12 @@
 package com.orange.lo.sample.kerlink2lo.lo;
 
-import org.apache.commons.codec.DecoderException;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.commons.codec.DecoderException;
+import org.junit.Test;
+
 
 public class PayloadCodecTest {
 
@@ -14,12 +15,13 @@ public class PayloadCodecTest {
         int rightLimit = 122;
         int targetStringLength = 10;
         Random random = new Random();
-        StringBuilder buffer = new StringBuilder(targetStringLength);
-        for (int i = 0; i < targetStringLength; i++) {
-            int randomLimitedInt = leftLimit + (int)(random.nextFloat() * (rightLimit - leftLimit + 1));
-            buffer.append((char) randomLimitedInt);
-        }
-        return buffer.toString();
+        
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        
+        return generatedString;
     }
 
     @Test
