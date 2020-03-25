@@ -19,8 +19,7 @@ public class PayloadCodecTest {
             int randomLimitedInt = leftLimit + (int)(random.nextFloat() * (rightLimit - leftLimit + 1));
             buffer.append((char) randomLimitedInt);
         }
-        String generatedString = buffer.toString();
-        return generatedString;
+        return buffer.toString();
     }
 
     @Test
