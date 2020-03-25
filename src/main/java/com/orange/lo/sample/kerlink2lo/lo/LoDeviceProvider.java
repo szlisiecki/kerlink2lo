@@ -35,9 +35,9 @@ public class LoDeviceProvider {
     private HttpEntity<Void> authenticationEntity;
     private final String DEVICES_PAGED_URL_TEMPLATE;
 
-    private String xTotalCountHeader = "X-Total-Count";
-    private String xRatelimitRemainingHeader = "X-Ratelimit-Remaining";
-    private String xRatelimitResetHeader = "X-Ratelimit-Reset";
+    private final String xTotalCountHeader = "X-Total-Count";
+    private final String xRatelimitRemainingHeader = "X-Ratelimit-Remaining";
+    private final String xRatelimitResetHeader = "X-Ratelimit-Reset";
    
     @Autowired
     public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders) {
@@ -51,7 +51,6 @@ public class LoDeviceProvider {
 
     public List<LoDevice> getDevices() {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
-
         for (int offset = 0;; offset++) {
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
             LOG.trace("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
@@ -62,13 +61,12 @@ public class LoDeviceProvider {
             if (devices.size() >= Integer.parseInt(response.getHeaders().get(xTotalCountHeader).get(0))) {
                 break;
             }
-            if (Integer.parseInt(response.getHeaders().get(xRatelimitRemainingHeader).get(0)) == 0) {
+            if (Integer.parseInt(response.getHeaders().get(xRatelimitRemainingHeader).get(0)) <25) {
                 long reset = Long.parseLong(response.getHeaders().get(xRatelimitResetHeader).get(0));
-                long current = new Date().getTime();
+                long current = System.currentTimeMillis();
                 try {
                     Thread.sleep(reset - current);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }
