@@ -10,8 +10,10 @@ package com.orange.lo.sample.kerlink2lo.lo;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,17 +29,17 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class LoDeviceProvider {
     private static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String PROPERTIES_FIELD = "properties";
     
     private RestTemplate restTemplate;
     private LoProperties loProperties;
     private HttpHeaders authenticationHeaders;
     private HttpEntity<Void> authenticationEntity;
     private final String DEVICES_PAGED_URL_TEMPLATE;
+    private final String GROUPS_PAGED_URL_TEMPLATE;
 
-    private final static String X_TOTAL_COUNT_HEADER = "X-Total-Count";
-    private final static String X_RATELIMIT_REMAINING_HEADER = "X-Ratelimit-Remaining";
-    private final static String X_RATELIMIT_RESET_HEADER = "X-Ratelimit-Reset";
+    private static final String X_TOTAL_COUNT_HEADER = "X-Total-Count";
+    private static final String X_RATELIMIT_REMAINING_HEADER = "X-Ratelimit-Remaining";
+    private static final String X_RATELIMIT_RESET_HEADER = "X-Ratelimit-Reset";
    
     @Autowired
     public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders) {
@@ -46,14 +48,47 @@ public class LoDeviceProvider {
         
         this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         this.authenticationEntity = new HttpEntity<Void>(authenticationHeaders);
-        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&groupId=" + loProperties.getDeviceGroupId() + "&fields=" + PROPERTIES_FIELD;
+        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=%d&groupId=%s&fields=id,name,group";
+        this.GROUPS_PAGED_URL_TEMPLATE = loProperties.getGroupsUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%d";
     }
 
+    @PostConstruct
+    public void postConstruct() {
+        LOG.info("Managing group of devices");
+        LOG.debug("Trying to get existing group");
+        int retrievedGroups = 0;
+        for (int offset = 0;; offset++) {
+            ResponseEntity<LoGroup[]> response = restTemplate.exchange(getPagedGroupsUrl(offset), HttpMethod.GET, authenticationEntity, LoGroup[].class);
+            if (response.getBody().length == 0) {
+                break;
+            }
+            retrievedGroups += response.getBody().length;
+            
+            Optional<LoGroup> kerlinkGroup = Arrays.stream(response.getBody()).filter(g -> loProperties.getDeviceGroupName().equals(g.getPathNode())).findFirst();
+            if (kerlinkGroup.isPresent()) {
+                loProperties.setDeviceGroupId(kerlinkGroup.get().getId());
+                LOG.debug("Group found");
+                return;
+            }
+            
+            if (retrievedGroups >= Integer.parseInt(response.getHeaders().get(X_TOTAL_COUNT_HEADER).get(0))) {
+                break;
+            }
+        }
+        LOG.debug("Group not found, trying to create new group");
+        LoGroup group = new LoGroup(null, loProperties.getDeviceGroupName());
+        HttpEntity<LoGroup> httpEntity = new HttpEntity<LoGroup>(group, authenticationHeaders);
+        ResponseEntity<LoGroup> response = restTemplate.exchange(loProperties.getGroupsUrl(), HttpMethod.POST, httpEntity, LoGroup.class);
+        loProperties.setDeviceGroupId(response.getBody().getId());
+        LOG.debug("New group created");
+    }
+    
     public List<LoDevice> getDevices() {
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
         for (int offset = 0;; offset++) {
+            LOG.trace("Calling LO url {}", getPagedDevicesUrl(offset));
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-            LOG.trace("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
+            LOG.trace("Got {} devices", response.getBody().length);
             if (response.getBody().length == 0) {
                 break;
             }
@@ -66,8 +101,7 @@ public class LoDeviceProvider {
                 long current = System.currentTimeMillis();
                 try {
                     Thread.sleep(reset - current);
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) {}
             }
         }
         LOG.trace("Devices: " + devices.toString());
@@ -89,6 +123,10 @@ public class LoDeviceProvider {
     }
 
     private String getPagedDevicesUrl(int offset) {
-        return String.format(DEVICES_PAGED_URL_TEMPLATE, offset * loProperties.getPageSize());
+        return String.format(DEVICES_PAGED_URL_TEMPLATE, offset * loProperties.getPageSize(), loProperties.getDeviceGroupId());
+    }
+    
+    private String getPagedGroupsUrl(int offset) {
+        return String.format(GROUPS_PAGED_URL_TEMPLATE, offset * loProperties.getPageSize());
     }
 }

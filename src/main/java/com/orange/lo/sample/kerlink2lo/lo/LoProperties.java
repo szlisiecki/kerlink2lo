@@ -16,6 +16,7 @@ public class LoProperties {
 
     private String apiKey;
     private String devicesUrl;
+    private String groupsUrl;
     private int pageSize;
     private String propertiesKey;
     private String propertiesValue;
@@ -26,6 +27,7 @@ public class LoProperties {
     private String connectorApiKey;
     private String connectorUser;
     private String connectorMqttUrl;
+    private String deviceGroupName;
     private String deviceGroupId;
     private String devicePrefix;
     private String messageDecoder;
@@ -148,5 +150,21 @@ public class LoProperties {
 
     public void setMessageDecoder(String messageDecoder) {
         this.messageDecoder = messageDecoder;
+    }
+
+    public String getGroupsUrl() {
+        return groupsUrl;
+    }
+
+    public void setGroupsUrl(String groupsUrl) {
+        this.groupsUrl = groupsUrl;
+    }
+
+    public String getDeviceGroupName() {
+        return deviceGroupName;
+    }
+
+    public void setDeviceGroupName(String deviceGroupName) {
+        this.deviceGroupName = deviceGroupName;
     }
 }
