@@ -9,6 +9,7 @@ package com.orange.lo.sample.kerlink2lo;
 
 import com.orange.lo.sample.kerlink2lo.kerlink.api.KerlinkApi;
 import com.orange.lo.sample.kerlink2lo.lo.ExternalConnectorService;
+import com.orange.lo.sample.kerlink2lo.lo.LoDeviceCache;
 import com.orange.lo.sample.kerlink2lo.lo.LoDeviceProvider;
 import com.orange.lo.sample.kerlink2lo.lo.LoProperties;
 

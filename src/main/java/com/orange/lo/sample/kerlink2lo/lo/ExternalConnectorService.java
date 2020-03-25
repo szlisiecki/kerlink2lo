@@ -7,7 +7,6 @@
 
 package com.orange.lo.sample.kerlink2lo.lo;
 
-import com.orange.lo.sample.kerlink2lo.LoDeviceCache;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownEventDto;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataUpDto;
 
