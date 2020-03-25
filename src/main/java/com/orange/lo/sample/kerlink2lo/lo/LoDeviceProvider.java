@@ -10,6 +10,7 @@ package com.orange.lo.sample.kerlink2lo.lo;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -33,6 +34,10 @@ public class LoDeviceProvider {
     private HttpHeaders authenticationHeaders;
     private HttpEntity<Void> authenticationEntity;
     private final String DEVICES_PAGED_URL_TEMPLATE;
+
+    private final static String X_TOTAL_COUNT_HEADER = "X-Total-Count";
+    private final static String X_RATELIMIT_REMAINING_HEADER = "X-Ratelimit-Remaining";
+    private final static String X_RATELIMIT_RESET_HEADER = "X-Ratelimit-Reset";
    
     @Autowired
     public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders) {
@@ -44,20 +49,25 @@ public class LoDeviceProvider {
         this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%1$s" + "&groupId=" + loProperties.getDeviceGroupId() + "&fields=" + PROPERTIES_FIELD;
     }
 
-    //TODO use x-total-count
-    //TODO use x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset"
     public List<LoDevice> getDevices() {
-        LOG.trace("Trying to get devices from LO");
         List<LoDevice> devices = new ArrayList<>(loProperties.getPageSize());
         for (int offset = 0;; offset++) {
             ResponseEntity<LoDevice[]> response = restTemplate.exchange(getPagedDevicesUrl(offset), HttpMethod.GET, authenticationEntity, LoDevice[].class);
-            LOG.debug("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
+            LOG.trace("Calling LO url {}, and got {} devices", getPagedDevicesUrl(offset), response.getBody().length);
             if (response.getBody().length == 0) {
                 break;
             }
             devices.addAll(Arrays.asList(response.getBody()));
-            if (response.getBody().length < loProperties.getPageSize()) {
+            if (devices.size() >= Integer.parseInt(response.getHeaders().get(X_TOTAL_COUNT_HEADER).get(0))) {
                 break;
+            }
+            if (Integer.parseInt(response.getHeaders().get(X_RATELIMIT_REMAINING_HEADER).get(0)) == 0) {
+                long reset = Long.parseLong(response.getHeaders().get(X_RATELIMIT_RESET_HEADER).get(0));
+                long current = System.currentTimeMillis();
+                try {
+                    Thread.sleep(reset - current);
+                } catch (InterruptedException e) {
+                }
             }
         }
         LOG.trace("Devices: " + devices.toString());

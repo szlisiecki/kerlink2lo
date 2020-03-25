@@ -25,6 +25,7 @@ public class LoConfig {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         headers.set("X-API-KEY", loProperties.getApiKey());
+        headers.set("X-Total-Count", "true");
         return headers;
     }
 }
