@@ -12,16 +12,13 @@ kerlink:
   
 lo:
   api-key: 7eccf568340943278c0495654b5de320
-  devices-url: https://liveobjects.orange-business.com/api/v1/deviceMgt/devices
-  groups-url:  https://liveobjects.orange-business.com/api/v1/deviceMgt/groups
+  api-url: https://liveobjects.orange-business.com/api/
   connector-api-key: 6fd77ec40dda4936be4d6f77174bdfe1
   connector-user: connector
   connector-mqtt-url: ssl://liveobjects.orange-business.com:8883
   synchronization-device-interval: 1000000
   synchronization-thread-pool-size: 40
   page-size: 20
-  properties-key: platform
-  properties-value: kerlink
   device-group-name: kerlink
   device-prefix: 'urn:lo:nsid:x-connector:'
   

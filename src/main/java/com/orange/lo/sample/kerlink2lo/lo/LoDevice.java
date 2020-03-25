@@ -66,4 +66,9 @@ public class LoDevice {
     public void setInterfaces(List<LoInterface> interfaces) {
         this.interfaces = interfaces;
     }
+
+    @Override
+    public String toString() {
+        return "LoDevice [id=" + id + ", name=" + name + ", group=" + group + ", interfaces=" + interfaces + "]";
+    }
 }

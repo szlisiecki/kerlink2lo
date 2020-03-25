@@ -86,9 +86,10 @@ public class KerlinkApi {
         while (href.isPresent()) {
             try {
                 String url = kerlinkProperties.getBaseUrl() + href.get();
+                LOG.trace("Calling kerlink url {}", url);
                 ResponseEntity<PaginatedDto<EndDeviceDto>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, returnType);
                 PaginatedDto<EndDeviceDto> body = responseEntity.getBody();
-                LOG.trace("Calling kerlink url {}, and got {} devices", url, body.getList().size());
+                LOG.trace("And got {} devices", body.getList().size());
                 devicesList.addAll(body.getList());
                 href = getNextPageHref(body.getLinks());
             } catch (Exception e) {

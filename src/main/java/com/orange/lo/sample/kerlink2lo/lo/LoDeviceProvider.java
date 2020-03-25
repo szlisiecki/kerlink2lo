@@ -41,6 +41,10 @@ public class LoDeviceProvider {
     private static final String X_RATELIMIT_REMAINING_HEADER = "X-Ratelimit-Remaining";
     private static final String X_RATELIMIT_RESET_HEADER = "X-Ratelimit-Reset";
    
+    private static final String DEVICES_ENDPOINT = "/v1/deviceMgt/devices";
+    private static final String GROOUPS_ENDPOINT = "/v1/deviceMgt/groups";
+    
+    
     @Autowired
     public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders) {
         this.loProperties = loProperties;
@@ -48,8 +52,8 @@ public class LoDeviceProvider {
         
         this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         this.authenticationEntity = new HttpEntity<Void>(authenticationHeaders);
-        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getDevicesUrl() + "?limit=" + loProperties.getPageSize() + "&offset=%d&groupId=%s&fields=id,name,group";
-        this.GROUPS_PAGED_URL_TEMPLATE = loProperties.getGroupsUrl() + "?limit=" + loProperties.getPageSize() + "&offset=" + "%d";
+        this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getApiUrl() + DEVICES_ENDPOINT + "?limit=" + loProperties.getPageSize() + "&offset=%d&groupId=%s&fields=id,name,group";
+        this.GROUPS_PAGED_URL_TEMPLATE = loProperties.getApiUrl() + GROOUPS_ENDPOINT + "?limit=" + loProperties.getPageSize() + "&offset=" + "%d";
     }
 
     @PostConstruct
@@ -78,7 +82,7 @@ public class LoDeviceProvider {
         LOG.debug("Group not found, trying to create new group");
         LoGroup group = new LoGroup(null, loProperties.getDeviceGroupName());
         HttpEntity<LoGroup> httpEntity = new HttpEntity<LoGroup>(group, authenticationHeaders);
-        ResponseEntity<LoGroup> response = restTemplate.exchange(loProperties.getGroupsUrl(), HttpMethod.POST, httpEntity, LoGroup.class);
+        ResponseEntity<LoGroup> response = restTemplate.exchange(loProperties.getApiUrl() + GROOUPS_ENDPOINT, HttpMethod.POST, httpEntity, LoGroup.class);
         loProperties.setDeviceGroupId(response.getBody().getId());
         LOG.debug("New group created");
     }
@@ -114,12 +118,12 @@ public class LoDeviceProvider {
         LoDevice device = new LoDevice(deviceId, loProperties.getDeviceGroupId(), loProperties.getDevicePrefix(), true);
         HttpEntity<LoDevice> httpEntity = new HttpEntity<LoDevice>(device, authenticationHeaders);
         
-        restTemplate.exchange(loProperties.getDevicesUrl(), HttpMethod.POST, httpEntity, Void.class);
+        restTemplate.exchange(loProperties.getApiUrl() + DEVICES_ENDPOINT, HttpMethod.POST, httpEntity, Void.class);
     }
 
     public void deleteDevice(String deviceId) {
         LOG.trace("Trying to delete device {} from LO", deviceId);
-        restTemplate.exchange(loProperties.getDevicesUrl() + "/" + deviceId, HttpMethod.DELETE, authenticationEntity, Void.class);
+        restTemplate.exchange(loProperties.getApiUrl() + DEVICES_ENDPOINT + "/" + deviceId, HttpMethod.DELETE, authenticationEntity, Void.class);
     }
 
     private String getPagedDevicesUrl(int offset) {
