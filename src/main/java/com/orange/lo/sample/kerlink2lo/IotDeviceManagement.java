@@ -36,12 +36,14 @@ public class IotDeviceManagement {
     private KerlinkApi kerlinkApi;
     private LoDeviceProvider loDeviceProvider;
     private ExternalConnectorService externalConnectorService;
+    private LoDeviceCache deviceCache;
     
-    public IotDeviceManagement(KerlinkApi kerlinkApi, LoDeviceProvider loDeviceProvider, ExternalConnectorService externalConnectorService, LoProperties loProperties) {
+    public IotDeviceManagement(KerlinkApi kerlinkApi, LoDeviceProvider loDeviceProvider, ExternalConnectorService externalConnectorService, LoProperties loProperties, LoDeviceCache deviceCache) {
         this.kerlinkApi = kerlinkApi;
         this.loDeviceProvider = loDeviceProvider;
         this.externalConnectorService = externalConnectorService;
         this.loProperties = loProperties;
+        this.deviceCache = deviceCache;
     }
     
     @Scheduled(fixedRateString = "${lo.synchronization-device-interval}")
@@ -53,6 +55,7 @@ public class IotDeviceManagement {
         
         Set<String> loIds = loDeviceProvider.getDevices().stream().map(d -> d.getId()).collect(Collectors.toSet());
         LOG.debug("Got {} devices from LO", loIds.size());
+        deviceCache.addAll(loIds);
         
         // add devices to LO
         Set<String> devicesToAddToLo = new HashSet<String>(kerlinkIds);
