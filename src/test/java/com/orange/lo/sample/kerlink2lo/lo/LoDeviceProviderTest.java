@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,8 +27,8 @@ public class LoDeviceProviderTest {
     @Autowired
     LoDeviceProvider loDeviceProvider;
 
-    @Mock
-    LoProperties loProperties;
+    @Autowired
+    private LoProperties loProperties;
 
     @Autowired
     private MockRestServiceServer server;
@@ -37,6 +38,7 @@ public class LoDeviceProviderTest {
 
     @Before
     public void setUp() throws Exception {
+        this.loDeviceProvider = new LoDeviceProvider(loProperties, new HttpHeaders());
         String loDeviceString = objectMapper.writeValueAsString(
                 new LoDevice("urn:lo:nsid:x-connector:0018B20000002345", null, null, true));
         server.expect(requestTo("https://liveobjects.orange-business.com/api/v1/deviceMgt/devices")).andRespond(withSuccess(loDeviceString, MediaType.APPLICATION_JSON));
