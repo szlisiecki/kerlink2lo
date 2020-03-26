@@ -72,6 +72,7 @@ public class PayloadCodecTest {
         String expected = "test input";
         // when
         String decoded = PayloadCodec.decodeFromHex(input);
+        // then
         assertEquals(expected, decoded);
     }
 
