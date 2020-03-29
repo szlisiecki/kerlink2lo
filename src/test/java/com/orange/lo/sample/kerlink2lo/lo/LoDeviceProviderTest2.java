@@ -4,13 +4,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.*;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +21,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RunWith(MockitoJUnitRunner.class)
+@RestClientTest(LoDeviceProvider.class)
 public class LoDeviceProviderTest2 {
 
     LoDeviceProvider loDeviceProvider;
@@ -31,6 +31,7 @@ public class LoDeviceProviderTest2 {
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         LoProperties loProperties = new LoProperties();
         HttpHeaders httpHeaders = null;
         loProperties.setDevicesUrl("localhost/v1/deviceMgt/devices?limit=2&offset=0&groupId=null&fields=id,name,group");
