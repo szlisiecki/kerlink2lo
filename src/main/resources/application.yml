@@ -8,6 +8,7 @@ kerlink:
   base-url: https://wmc-poc.wanesy.com/gms
   login: szymon.lisiecki
   password: \65~R?8yv34u
+  login-interval: 32400000
   page-size: 20
   
 lo:
@@ -16,7 +17,7 @@ lo:
   connector-api-key: 6fd77ec40dda4936be4d6f77174bdfe1
   connector-user: connector
   connector-mqtt-url: ssl://liveobjects.orange-business.com:8883
-  synchronization-device-interval: 1000000
+  synchronization-device-interval: 10000
   synchronization-thread-pool-size: 40
   page-size: 20
   device-group-name: kerlink

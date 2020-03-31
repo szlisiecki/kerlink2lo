@@ -24,6 +24,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -59,32 +60,45 @@ public class LoDeviceProvider {
     @PostConstruct
     public void postConstruct() {
         LOG.info("Managing group of devices");
-        LOG.debug("Trying to get existing group");
-        int retrievedGroups = 0;
-        for (int offset = 0;; offset++) {
-            ResponseEntity<LoGroup[]> response = restTemplate.exchange(getPagedGroupsUrl(offset), HttpMethod.GET, authenticationEntity, LoGroup[].class);
-            if (response.getBody().length == 0) {
-                break;
+        try {
+            LOG.debug("Trying to get existing group");
+            int retrievedGroups = 0;
+            for (int offset = 0;; offset++) {
+                try {
+                    ResponseEntity<LoGroup[]> response = restTemplate.exchange(getPagedGroupsUrl(offset), HttpMethod.GET, authenticationEntity, LoGroup[].class);
+                    if (response.getBody().length == 0) {
+                        break;
+                    }
+                    retrievedGroups += response.getBody().length;
+                    
+                    Optional<LoGroup> kerlinkGroup = Arrays.stream(response.getBody()).filter(g -> loProperties.getDeviceGroupName().equals(g.getPathNode())).findFirst();
+                    if (kerlinkGroup.isPresent()) {
+                        loProperties.setDeviceGroupId(kerlinkGroup.get().getId());
+                        LOG.debug("Group found");
+                        return;
+                    }
+                    
+                    if (retrievedGroups >= Integer.parseInt(response.getHeaders().get(X_TOTAL_COUNT_HEADER).get(0))) {
+                        break;
+                    }                    
+                } catch (HttpClientErrorException e) {
+                    LOG.error("Cannot retrieve information about groups \n {}",e.getResponseBodyAsString());
+                    System.exit(1);
+                }
             }
-            retrievedGroups += response.getBody().length;
-            
-            Optional<LoGroup> kerlinkGroup = Arrays.stream(response.getBody()).filter(g -> loProperties.getDeviceGroupName().equals(g.getPathNode())).findFirst();
-            if (kerlinkGroup.isPresent()) {
-                loProperties.setDeviceGroupId(kerlinkGroup.get().getId());
-                LOG.debug("Group found");
-                return;
-            }
-            
-            if (retrievedGroups >= Integer.parseInt(response.getHeaders().get(X_TOTAL_COUNT_HEADER).get(0))) {
-                break;
-            }
+            LOG.debug("Group not found, trying to create new group");
+            LoGroup group = new LoGroup(null, loProperties.getDeviceGroupName());
+            HttpEntity<LoGroup> httpEntity = new HttpEntity<LoGroup>(group, authenticationHeaders);
+            ResponseEntity<LoGroup> response = restTemplate.exchange(loProperties.getApiUrl() + GROOUPS_ENDPOINT, HttpMethod.POST, httpEntity, LoGroup.class);
+            loProperties.setDeviceGroupId(response.getBody().getId());
+            LOG.debug("New group created");
+        } catch (HttpClientErrorException e) {
+            LOG.error("Cannot create group \n {}",e.getResponseBodyAsString());
+            System.exit(1);
+        } catch (Exception e) {
+            LOG.error("Unexpected error while managing group {}",e.getMessage());
+            System.exit(1);
         }
-        LOG.debug("Group not found, trying to create new group");
-        LoGroup group = new LoGroup(null, loProperties.getDeviceGroupName());
-        HttpEntity<LoGroup> httpEntity = new HttpEntity<LoGroup>(group, authenticationHeaders);
-        ResponseEntity<LoGroup> response = restTemplate.exchange(loProperties.getApiUrl() + GROOUPS_ENDPOINT, HttpMethod.POST, httpEntity, LoGroup.class);
-        loProperties.setDeviceGroupId(response.getBody().getId());
-        LOG.debug("New group created");
     }
     
     public List<LoDevice> getDevices() {
@@ -105,7 +119,9 @@ public class LoDeviceProvider {
                 long current = System.currentTimeMillis();
                 try {
                     Thread.sleep(reset - current);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                    //no matter
+                }
             }
         }
         LOG.trace("Devices: " + devices.toString());
