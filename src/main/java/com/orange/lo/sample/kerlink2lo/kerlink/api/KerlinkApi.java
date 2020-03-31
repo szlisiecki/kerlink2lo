@@ -55,8 +55,8 @@ public class KerlinkApi {
         this.firstHref = "/application/endDevices?fields=devEui,devAddr,name,country,status&sort=%2BdevEui&page=1&pageSize=" + kerlinkProperties.getPageSize();
         this.login();
     }
-
-    @Scheduled(initialDelay = 32400000, fixedRate = 32400000) // every 9 hours
+    
+    @Scheduled(fixedRateString = "${kerlink.login-interval}")
     public void login() {
         LOG.info("Trying to login and get bearer token");
         UserDto userDto = new UserDto();
@@ -84,18 +84,13 @@ public class KerlinkApi {
         List<EndDeviceDto> devicesList = new ArrayList<EndDeviceDto>();
         Optional<String> href = Optional.of(firstHref);
         while (href.isPresent()) {
-            try {
-                String url = kerlinkProperties.getBaseUrl() + href.get();
-                LOG.trace("Calling kerlink url {}", url);
-                ResponseEntity<PaginatedDto<EndDeviceDto>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, returnType);
-                PaginatedDto<EndDeviceDto> body = responseEntity.getBody();
-                LOG.trace("And got {} devices", body.getList().size());
-                devicesList.addAll(body.getList());
-                href = getNextPageHref(body.getLinks());
-            } catch (Exception e) {
-                LOG.error("Error while retrieve data from Kerlink platform, " + e);
-                return Collections.emptyList();
-            }
+            String url = kerlinkProperties.getBaseUrl() + href.get();
+            LOG.trace("Calling kerlink url {}", url);
+            ResponseEntity<PaginatedDto<EndDeviceDto>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, returnType);
+            PaginatedDto<EndDeviceDto> body = responseEntity.getBody();
+            LOG.trace("And got {} devices", body.getList().size());
+            devicesList.addAll(body.getList());
+            href = getNextPageHref(body.getLinks());
         }
         return devicesList;
     }
@@ -103,14 +98,10 @@ public class KerlinkApi {
     public Optional<String> sendCommand(DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<DataDownDto> httpEntity = prepareHttpEntity(token, dataDownDto);
-        try {
-            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
-            String commandId = response.getHeaders().getLocation().getPath().substring(22);
-            return Optional.of(commandId);
-        } catch (HttpClientErrorException e) {
-            LOG.error("Error while trying to send command to Kerlink device, ", e);
-            return Optional.empty();
-        }
+        
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
+        String commandId = response.getHeaders().getLocation().getPath().substring(22);
+        return Optional.of(commandId);
     }
 
     private HttpEntity<Void> prepareHttpEntity(String token) {

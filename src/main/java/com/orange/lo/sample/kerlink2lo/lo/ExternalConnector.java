@@ -11,6 +11,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.lo.sample.kerlink2lo.CommandMapper;
 import com.orange.lo.sample.kerlink2lo.CommandMapper.LoCommand;
+import com.orange.lo.sample.kerlink2lo.exceptions.EncodingTypeException;
+import com.orange.lo.sample.kerlink2lo.exceptions.LoMqttException;
+import com.orange.lo.sample.kerlink2lo.exceptions.ParseException;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.KerlinkApi;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownDto;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownEventDto;
@@ -27,12 +30,15 @@ import java.lang.invoke.MethodHandles;
 import java.util.Base64;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -64,8 +70,16 @@ public class ExternalConnector {
         this.objectMapper = objectMapper;
         this.commandMapper = commandMapper;
         this.loProperties = loProperties;
-
-        receiveCommands();
+    }
+    
+    @PostConstruct
+    public void receiveCommands() {
+        try {
+            LOG.info("Run commands subscriber");
+            loMqttClient.subscribe(COMMAND_REQUEST_TOPIC, loProperties.getMessageQos(), new MessageListener());
+        } catch (MqttException e) {
+            throw new LoMqttException(e);
+        }
     }
 
     public void sendMessage(DataUpDto dataUpDto) {
@@ -100,15 +114,7 @@ public class ExternalConnector {
         publish(topic, msg);
     }
 
-    public void receiveCommands() {
-        try {
-            LOG.info("Run commands subscriber");
-            loMqttClient.subscribe(COMMAND_REQUEST_TOPIC, loProperties.getMessageQos(), new MessageListener());
-        } catch (MqttException e) {
-            throw new RuntimeException(e);
-            //TODO create custom exception
-        }
-    }
+    
     
     public void sendCommandResponse(DataDownEventDto dataDownEventDto) {
         Optional<LoCommand> loCommand = commandMapper.get(dataDownEventDto.getDataDownId());
@@ -132,17 +138,15 @@ public class ExternalConnector {
             msg.setPayload(payload.getBytes());
             return msg;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-            //TODO create custom exception
+            throw new ParseException(e);
         }
     }
 
     private void publish(String topic, MqttMessage msg) {
         try {
             loMqttClient.publish(topic, msg);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-            //TODO create custom exception
+        } catch (MqttException e) {
+            throw new LoMqttException(e);
         }
     }
     
@@ -157,8 +161,7 @@ public class ExternalConnector {
                     byte[] decodeHex = Hex.decodeHex(dataUpDto.getPayload());
                     dataUpDto.setPayload(new String(decodeHex));
                 } catch (DecoderException e) {
-                    throw new RuntimeException(e);
-                    //TODO create custom exception
+                    throw new EncodingTypeException(e);
                 }
                 break;
             default:

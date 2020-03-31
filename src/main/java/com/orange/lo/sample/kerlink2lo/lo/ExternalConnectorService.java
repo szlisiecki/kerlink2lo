@@ -34,14 +34,10 @@ public class ExternalConnectorService {
     }
     
     public void sendMessage(DataUpDto dataUpDto) {
-        try {
-            if (!deviceCache.contains(dataUpDto.getEndDevice().getDevEui())) {
-                createDevice(dataUpDto.getEndDevice().getDevEui());
-            }
-            externalConnector.sendMessage(dataUpDto);            
-        } catch (Exception e) {
-            LOG.error("Unable to send message",e);
+        if (!deviceCache.contains(dataUpDto.getEndDevice().getDevEui())) {
+            createDevice(dataUpDto.getEndDevice().getDevEui());
         }
+        externalConnector.sendMessage(dataUpDto);            
     }
     
     public void sendCommandResponse(DataDownEventDto dataDownEventDto) {
@@ -49,22 +45,14 @@ public class ExternalConnectorService {
     }
     
     public void createDevice(String kerlinkDeviceId) {
-        try {
-            loDeviceProvider.addDevice(kerlinkDeviceId);
-            externalConnector.sendStatus(kerlinkDeviceId);
-            deviceCache.add(kerlinkDeviceId);
-        } catch (Exception e) {
-            LOG.error("Unable to create device",e);
-        }
+        loDeviceProvider.addDevice(kerlinkDeviceId);
+        externalConnector.sendStatus(kerlinkDeviceId);
+        deviceCache.add(kerlinkDeviceId);        
     }
     
     public void deleteDevice(String loDeviceId) {
-        try {
-            loDeviceProvider.deleteDevice(loDeviceId);
-            String kerlinkDeviceId = loDeviceId.substring(loProperties.getDevicePrefix().length());
-            deviceCache.delete(kerlinkDeviceId);
-        } catch (Exception e) {
-            LOG.error("Unable to delete device",e);
-        }
+        loDeviceProvider.deleteDevice(loDeviceId);
+        String kerlinkDeviceId = loDeviceId.substring(loProperties.getDevicePrefix().length());
+        deviceCache.delete(kerlinkDeviceId);
     }
 }
