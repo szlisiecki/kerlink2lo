@@ -10,17 +10,11 @@ package com.orange.lo.sample.kerlink2lo.lo;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataDownEventDto;
 import com.orange.lo.sample.kerlink2lo.kerlink.api.model.DataUpDto;
 
-import java.lang.invoke.MethodHandles;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ExternalConnectorService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    
     private ExternalConnector externalConnector;
     private LoDeviceProvider loDeviceProvider;
     private LoDeviceCache deviceCache;

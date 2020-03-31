@@ -119,7 +119,9 @@ public class LoDeviceProvider {
                 long current = System.currentTimeMillis();
                 try {
                     Thread.sleep(reset - current);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                    //no matter
+                }
             }
         }
         LOG.trace("Devices: " + devices.toString());
@@ -132,7 +134,7 @@ public class LoDeviceProvider {
         LoDevice device = new LoDevice(deviceId, loProperties.getDeviceGroupId(), loProperties.getDevicePrefix(), true);
         HttpEntity<LoDevice> httpEntity = new HttpEntity<LoDevice>(device, authenticationHeaders);
         
-        restTemplate.exchange(loProperties.getApiUrl() + DEVICES_ENDPOINT , HttpMethod.POST, httpEntity, Void.class);
+        restTemplate.exchange(loProperties.getApiUrl() + DEVICES_ENDPOINT, HttpMethod.POST, httpEntity, Void.class);
     }
 
     public void deleteDevice(String deviceId) {
