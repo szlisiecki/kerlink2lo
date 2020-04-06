@@ -77,7 +77,7 @@ public class LoDeviceProviderTest2 {
     }
 
     @Test
-    public void shouldGetDevicesWithLimitUndercostamOfTotalCount() {
+    public void shouldGetDevicesWithLimitBeingAliquotOfTotalCount() {
         int limit = 2;
         int total = 4;
         when(loProperties.getPageSize()).thenReturn(limit);
@@ -92,7 +92,7 @@ public class LoDeviceProviderTest2 {
     }
 
     @Test
-    public void shouldGetDevicesWithLimitNotUndercostamOfTotalCount() {
+    public void shouldGetDevicesWithLimitNotBeingAliquotOfTotalCount() {
         int limit = 2;
         int total = 3;
         when(loProperties.getPageSize()).thenReturn(limit);
