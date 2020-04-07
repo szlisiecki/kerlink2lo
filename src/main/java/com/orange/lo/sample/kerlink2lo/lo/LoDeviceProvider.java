@@ -104,7 +104,9 @@ public class LoDeviceProvider {
                 long current = System.currentTimeMillis();
                 try {
                     Thread.sleep(reset - current);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+
+                }
             }
         }
         LOG.trace("Devices: " + devices.toString());
