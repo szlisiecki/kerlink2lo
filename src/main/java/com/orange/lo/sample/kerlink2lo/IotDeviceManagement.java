@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 @EnableScheduling
 @Component
@@ -51,41 +52,48 @@ public class IotDeviceManagement {
     public void synchronizeDevices() throws InterruptedException {
         LOG.info("Synchronizing devices... ");
 
-        Set<String> kerlinkIds = kerlinkApi.getEndDevices().stream().map(d -> d.getDevEui()).collect(Collectors.toSet());
-        LOG.debug("Got {} devices from Kerlink", kerlinkIds.size());
-        
-        Set<String> loIds = loDeviceProvider.getDevices().stream().map(d -> d.getId()).collect(Collectors.toSet());
-        LOG.debug("Got {} devices from LO", loIds.size());
-        deviceCache.addAll(loIds);
-        
-        // add devices to LO
-        Set<String> devicesToAddToLo = new HashSet<String>(kerlinkIds);
-        devicesToAddToLo.removeAll(loIds.stream().map(loId -> loId.substring(loProperties.getDevicePrefix().length())).collect(Collectors.toSet()));   
-        LOG.debug("Devices to add to LO: {}", devicesToAddToLo.toString());
-        
-        // remove devices from LO
-        Set<String> devicesToRemoveFromLo = new HashSet<String>(loIds);
-        devicesToRemoveFromLo.removeAll(kerlinkIds.stream().map(kerlinkId -> loProperties.getDevicePrefix() + kerlinkId).collect(Collectors.toSet()));
-        LOG.debug("Devices to remove from LO: {}", devicesToRemoveFromLo.toString());
-        
-        if (devicesToAddToLo.size() + devicesToRemoveFromLo.size() > 0) {
-            ThreadPoolExecutor synchronizingExecutor = new ThreadPoolExecutor(
-                    loProperties.getSynchronizationThreadPoolSize(), loProperties.getSynchronizationThreadPoolSize(),
-                    10, TimeUnit.SECONDS,
-                    new ArrayBlockingQueue<>(devicesToAddToLo.size() + devicesToRemoveFromLo.size()));
+        try {
+            Set<String> kerlinkIds = kerlinkApi.getEndDevices().stream().map(d -> d.getDevEui()).collect(Collectors.toSet());
+            LOG.debug("Got {} devices from Kerlink", kerlinkIds.size());
             
-            for (String deviceId : devicesToAddToLo) {
-                synchronizingExecutor.execute(() -> {
-                    externalConnectorService.createDevice(deviceId);
-                    LOG.debug("Device created for {}", deviceId);
-                });
+            Set<String> loIds = loDeviceProvider.getDevices().stream().map(d -> d.getId()).collect(Collectors.toSet());
+            LOG.debug("Got {} devices from LO", loIds.size());
+            Set<String> loIdsWithoutPrefix = loIds.stream().map(loId -> loId.substring(loProperties.getDevicePrefix().length())).collect(Collectors.toSet());
+            deviceCache.addAll(loIdsWithoutPrefix);
+            
+            // add devices to LO
+            Set<String> devicesToAddToLo = new HashSet<String>(kerlinkIds);
+            devicesToAddToLo.removeAll(loIdsWithoutPrefix);   
+            LOG.debug("Devices to add to LO: {}", devicesToAddToLo.toString());
+            
+            // remove devices from LO
+            Set<String> devicesToRemoveFromLo = new HashSet<String>(loIds);
+            devicesToRemoveFromLo.removeAll(kerlinkIds.stream().map(kerlinkId -> loProperties.getDevicePrefix() + kerlinkId).collect(Collectors.toSet()));
+            LOG.debug("Devices to remove from LO: {}", devicesToRemoveFromLo.toString());
+            
+            if (devicesToAddToLo.size() + devicesToRemoveFromLo.size() > 0) {
+                ThreadPoolExecutor synchronizingExecutor = new ThreadPoolExecutor(
+                        loProperties.getSynchronizationThreadPoolSize(), loProperties.getSynchronizationThreadPoolSize(),
+                        10, TimeUnit.SECONDS,
+                        new ArrayBlockingQueue<>(devicesToAddToLo.size() + devicesToRemoveFromLo.size()));
+                
+                for (String deviceId : devicesToAddToLo) {
+                    synchronizingExecutor.execute(() -> {
+                        externalConnectorService.createDevice(deviceId);
+                        LOG.debug("Device created for {}", deviceId);
+                    });
+                }
+                for (String deviceId : devicesToRemoveFromLo) {
+                    synchronizingExecutor.execute(() -> {
+                        externalConnectorService.deleteDevice(deviceId);
+                        LOG.debug("Device deleted for {}", deviceId);
+                    });
+                }
             }
-            for (String deviceId : devicesToRemoveFromLo) {
-                synchronizingExecutor.execute(() -> {
-                    externalConnectorService.deleteDevice(deviceId);
-                    LOG.debug("Device deleted for {}", deviceId);
-                });
-            }
+        } catch (HttpClientErrorException e) {
+            LOG.error("Error in device synchronization process \n{}", e.getResponseBodyAsString());
+        } catch (Exception e) {
+            LOG.error("Error in device synchronization process \n{}", e);
         }
     }
 }

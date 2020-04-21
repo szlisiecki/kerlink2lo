@@ -14,12 +14,17 @@ import com.orange.lo.sample.kerlink2lo.lo.ExternalConnectorService;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Callable;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 public class Kerlink2LoController {
@@ -44,8 +49,24 @@ public class Kerlink2LoController {
     public Callable<ResponseEntity<Void>> dataDown(@RequestBody DataDownEventDto dataDownEventDto) {
         LOG.debug("received command response {}", dataDownEventDto);
         return () -> {
-            externalConnectorService.sendCommandResponse(dataDownEventDto);
-            return ResponseEntity.ok().build();
+            if ("OK".equals(dataDownEventDto.getStatus())) {
+                externalConnectorService.sendCommandResponse(dataDownEventDto);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.ok().build();                
+            }
         };
+    }
+    
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<String> handleIOException(HttpClientErrorException ex, HttpServletRequest request) {
+        LOG.error("Error while processing call {}, \n{}", request.getRequestURI(), ex.getResponseBodyAsString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getResponseBodyAsString());
+    }
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex, HttpServletRequest request) {
+        LOG.error("Error while processing call {}", request.getRequestURI(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }
