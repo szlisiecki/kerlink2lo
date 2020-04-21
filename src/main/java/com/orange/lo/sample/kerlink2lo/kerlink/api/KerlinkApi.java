@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+
 
 
 @Component
@@ -48,14 +50,14 @@ public class KerlinkApi {
     private String token;
 
     @Autowired
-    public KerlinkApi(KerlinkProperties kerlinkProperties) {
+    public KerlinkApi(KerlinkProperties kerlinkProperties, RestTemplate restTemplate) {
         this.kerlinkProperties = kerlinkProperties;
-        this.restTemplate = prepareRestTemplate();
+        this.restTemplate = restTemplate;
         this.firstHref = "/application/endDevices?fields=devEui,devAddr,name,country,status&sort=%2BdevEui&page=1&pageSize=" + kerlinkProperties.getPageSize();
-        this.login();
     }
     
     @Scheduled(fixedRateString = "${kerlink.login-interval}")
+    @PostConstruct
     public void login() {
         LOG.info("Trying to login and get bearer token");
         UserDto userDto = new UserDto();
@@ -67,7 +69,7 @@ public class KerlinkApi {
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 this.httpEntity = prepareHttpEntity("Bearer " + responseEntity.getBody().getToken());
                 this.token = "Bearer " + responseEntity.getBody().getToken();
-                LOG.debug("Kerlink Token: {}",this.token);
+                LOG.debug("Kerlink Token: {}", this.token);
             } else {
                 LOG.error("Error while trying to login to Kerlink platform, returned status code is {}", responseEntity.getStatusCodeValue());
                 System.exit(1);
@@ -97,7 +99,6 @@ public class KerlinkApi {
     public Optional<String> sendCommand(DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<DataDownDto> httpEntity = prepareHttpEntity(token, dataDownDto);
-        
         ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
         String commandId = response.getHeaders().getLocation().getPath().substring(22);
         return Optional.of(commandId);
@@ -120,14 +121,6 @@ public class KerlinkApi {
     }
 
     private Optional<String> getNextPageHref(List<LinkDto> links) {
-        return links.stream().filter(l -> l.getRel().equals("next")).findFirst().map(l -> l.getHref());
-    }
-
-    private RestTemplate prepareRestTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
-        defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
-        restTemplate.setUriTemplateHandler(defaultUriBuilderFactory);
-        return restTemplate;
+        return links.stream().filter(l -> "next".equals(l.getRel())).findFirst().map(l -> l.getHref());
     }
 }
