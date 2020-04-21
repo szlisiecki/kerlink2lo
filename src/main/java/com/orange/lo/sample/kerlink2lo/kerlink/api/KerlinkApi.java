@@ -35,7 +35,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+
 
 
 @Component
@@ -69,7 +69,7 @@ public class KerlinkApi {
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 this.httpEntity = prepareHttpEntity("Bearer " + responseEntity.getBody().getToken());
                 this.token = "Bearer " + responseEntity.getBody().getToken();
-                LOG.debug("Kerlink Token: {}",this.token);
+                LOG.debug("Kerlink Token: {}", this.token);
             } else {
                 LOG.error("Error while trying to login to Kerlink platform, returned status code is {}", responseEntity.getStatusCodeValue());
                 System.exit(1);
@@ -99,7 +99,6 @@ public class KerlinkApi {
     public Optional<String> sendCommand(DataDownDto dataDownDto) {
         String url = kerlinkProperties.getBaseUrl() + "/application/dataDown";
         HttpEntity<DataDownDto> httpEntity = prepareHttpEntity(token, dataDownDto);
-        
         ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Void.class);
         String commandId = response.getHeaders().getLocation().getPath().substring(22);
         return Optional.of(commandId);
@@ -122,6 +121,6 @@ public class KerlinkApi {
     }
 
     private Optional<String> getNextPageHref(List<LinkDto> links) {
-        return links.stream().filter(l -> l.getRel().equals("next")).findFirst().map(l -> l.getHref());
+        return links.stream().filter(l -> "next".equals(l.getRel())).findFirst().map(l -> l.getHref());
     }
 }
