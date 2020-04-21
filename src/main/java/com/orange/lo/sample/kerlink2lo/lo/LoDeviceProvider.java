@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -46,7 +47,7 @@ public class LoDeviceProvider {
     
     
     @Autowired
-    public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders, RestTemplate restTemplate) {
+    public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders, @Qualifier("loRestTemplate") RestTemplate restTemplate) {
         this.loProperties = loProperties;
         this.authenticationHeaders = authenticationHeaders;
         this.restTemplate = restTemplate;

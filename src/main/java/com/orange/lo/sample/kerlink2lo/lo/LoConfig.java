@@ -31,7 +31,7 @@ public class LoConfig {
         return headers;
     }
     
-    @Bean
+    @Bean(name = "loRestTemplate")
     public RestTemplate restTemplate() {
         return new RestTemplate(new HttpComponentsClientHttpRequestFactory());
     }
