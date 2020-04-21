@@ -10,6 +10,8 @@ package com.orange.lo.sample.kerlink2lo.lo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class LoConfig {
@@ -27,5 +29,10 @@ public class LoConfig {
         headers.set("X-API-KEY", loProperties.getApiKey());
         headers.set("X-Total-Count", "true");
         return headers;
+    }
+    
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate(new HttpComponentsClientHttpRequestFactory());
     }
 }

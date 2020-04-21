@@ -22,7 +22,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -47,11 +46,11 @@ public class LoDeviceProvider {
     
     
     @Autowired
-    public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders) {
+    public LoDeviceProvider(LoProperties loProperties, HttpHeaders authenticationHeaders, RestTemplate restTemplate) {
         this.loProperties = loProperties;
         this.authenticationHeaders = authenticationHeaders;
+        this.restTemplate = restTemplate;
         
-        this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         this.authenticationEntity = new HttpEntity<Void>(authenticationHeaders);
         this.DEVICES_PAGED_URL_TEMPLATE = loProperties.getApiUrl() + DEVICES_ENDPOINT + "?limit=" + loProperties.getPageSize() + "&offset=%d&groupId=%s&fields=id,name,group";
         this.GROUPS_PAGED_URL_TEMPLATE = loProperties.getApiUrl() + GROOUPS_ENDPOINT + "?limit=" + loProperties.getPageSize() + "&offset=" + "%d";
