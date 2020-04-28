@@ -94,14 +94,15 @@ You can change all values but the most important are:
 #### Loging
 Logging configuration can be found in **logback.xml** file located in src/main/resources. You can find more information about how to configure your logs [here](http://logback.qos.ch/manual/configuration.html) 
 
-#### Generating API keys
+#### Generate API keys
 Login to Orange Web Portal an go to Configuration -> API keys 
 
-![Api Keys](/assets/api_key_1.jpg) 
+![Api Keys 1](/assets/api_key_1.jpg) 
 
 Click **Add** button and fill fields
 
-![Api Keys](/assets/api_key_2.jpg)
+![Api Keys 2] (/assets/api_key_2.jpg)
+
 
 #### Devices group
 You can easily find devices group in main devices view. Just go to **devices** in main top menu
@@ -115,14 +116,14 @@ Login to Kerlink Wanesy Management Center and go to **Administration -> Clusters
 
 Click **plus** button to add new push configuration
 
-![Push Confiuration](/assets/push_configuration_2.png)
+![Push Confiuration 2](/assets/push_configuration_2.png)
 
 Fill fields in next screens
 
-![Push Confiuration](/assets/push_configuration_3.png)
+![Push Confiuration 3](/assets/push_configuration_3.png)
 
-![Push Confiuration](/assets/push_configuration_4.png)
+![Push Confiuration 4](/assets/push_configuration_4.png)
 
 And now go to **Administration -> Clusters ** and click edit icon next to the cluster you want to edit and choose new push configuration 
 
-![Push Confiuration](/assets/push_configuration_4.png)
+![Cluster Confiuration](/assets/cluster_configuration.png)
