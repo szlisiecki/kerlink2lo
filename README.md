@@ -124,6 +124,6 @@ Fill fields in next screens
 
 ![Push Confiuration 4](/assets/push_configuration_4.png)
 
-And now go to **Administration -> Clusters ** and click edit icon next to the cluster you want to edit and choose new push configuration 
+And now go to **Administration -> Clusters** and click edit icon next to the cluster you want to edit and choose new push configuration 
 
 ![Cluster Confiuration](/assets/cluster_configuration.png)
