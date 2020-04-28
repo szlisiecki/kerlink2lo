@@ -97,17 +97,17 @@ Logging configuration can be found in **logback.xml** file located in src/main/r
 #### Generate API keys
 Login to Orange Web Portal an go to Configuration -> API keys 
 
-![Api Keys 1](/assets/api_key_1.jpg) 
+![Api Keys 1](/assets/api_key_1.png) 
 
 Click **Add** button and fill fields
 
-![Api Keys 2] (/assets/api_key_2.jpg)
+![Api Keys 2](/assets/api_key_2.png)
 
 
 #### Devices group
 You can easily find devices group in main devices view. Just go to **devices** in main top menu
 
-![Devices](/assets/devices.jpg)
+![Devices](/assets/devices.png)
 
 #### Kerlink Push mechanizm
 Login to Kerlink Wanesy Management Center and go to **Administration -> Clusters -> Push Configurations**
