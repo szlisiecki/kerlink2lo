@@ -4,7 +4,7 @@
 * [Configuration](#configuration)
 
 ## General info
-This repository contains everything you need to create 'Kerlink to Live Object' connector. This connector was designed to synchronize data between Kerlink 'Wanesy Management Center' and Live Object Platform. Current version of connector allows to make one way synchronization - we can synchronize information from Kerlink to Live Object.
+This repository contains everything you need to create 'Kerlink to Live Objects' connector. This connector was designed to synchronize data between Kerlink 'Wanesy Management Center' and Live Objects Platform. Current version of connector allows to make one way synchronization - we can synchronize information from Kerlink to Live Objects.
 
 Three main features are:
 * **devices synchronization** - every device created in Kerlink will appear in LO and every device deleted from Kerlink will be also deleted from LO
@@ -65,19 +65,19 @@ You can change all values but the most important are:
 
 *12* - Kerlink REST page size (max 1000)
 
-*15 - Live Object API key with at least DEVICE\_R and DEVICE\_W roles 
+*15 - Live Objects API key with at least DEVICE\_R and DEVICE\_W roles 
 
-*16* - Live Object REST API url
+*16* - Live Objects REST API url
 
-*17* - Live Object API key with at least CONNECTOR_ACCESS role
+*17* - Live Objects API key with at least CONNECTOR_ACCESS role
 
-*19* - Live Object mqtt url
+*19* - Live Objects mqtt url
 
 *20* - Interval between devices synchronization process (in milliseconds)
 
 *21* - How many threads will be used in devices synchronization process
 
-*20* - Live Object REST page size (max 1000)
+*20* - Live Objects REST page size (max 1000)
 
 *23* - Device group name. If group name does not exists it will be created
 
@@ -89,7 +89,7 @@ You can change all values but the most important are:
 
 *28* - message QoS
 
-*29* - Name of Live Object message decoder. Can be empty but if set it will be applied to all messages from every device
+*29* - Name of Live Objects message decoder. Can be empty but if set it will be applied to all messages from every device
 
 #### Loging
 Logging configuration can be found in **logback.xml** file located in src/main/resources. You can find more information about how to configure your logs [here](http://logback.qos.ch/manual/configuration.html) 
