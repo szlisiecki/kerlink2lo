@@ -4,12 +4,15 @@
 * [Configuration](#configuration)
 
 ## General info
+![Architecture](/assets/architecture.png)
 This repository contains everything you need to create 'Kerlink to Live Objects' connector. This connector was designed to synchronize data between Kerlink 'Wanesy Management Center' and Live Objects Platform. Current version of connector allows to make one way synchronization - we can synchronize information from Kerlink to Live Objects.
 
 Three main features are:
 * **devices synchronization** - every device created in Kerlink will appear in LO and every device deleted from Kerlink will be also deleted from LO
 * **messages synchronization** - every message which will be send from device to Kerlink will appear in LO
-* **commands synchronization** - every command created in LO will be send to Kerlink and status in LO will be updated
+* **commands synchronization** - every command created in LO will be sent to Kerlink and status in LO will be updated
+
+One connector can handle one customer (one Kerling account). If you have more accounts you need to setup one instance of connector per each account.
 
 ## Technologies
 * Java 8
