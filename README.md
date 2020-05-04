@@ -12,7 +12,7 @@ Three main features are:
 * **messages synchronization** - every message which will be send from device to Kerlink will appear in LO
 * **commands synchronization** - every command created in LO will be sent to Kerlink and status in LO will be updated
 
-One connector can handle one customer (one Kerling account). If you have more accounts you need to setup one instance of connector per each account.
+One connector can handle one customer (one Kerlink account). If you have more accounts you need to setup one instance of connector per each account.
 
 ## Technologies
 * Java 8
