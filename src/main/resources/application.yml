@@ -2,7 +2,7 @@ server:
   port: 48080
 spring:
   application:
-    name: Lo2IotHub
+    name: Kerlink2IotHub
     
 kerlink:
   base-url: https://wmc-poc.wanesy.com/gms
