@@ -27,13 +27,11 @@ import com.orange.lo.sample.kerlink2lo.lo.model.NodeStatus;
 import com.orange.lo.sample.kerlink2lo.lo.model.NodeStatus.Capabilities;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Base64;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -53,8 +51,10 @@ public class ExternalConnector {
     
     private static final String F_PORT_KEY = "fPort";
     private static final String F_PORT_DEFAULT = "1";
-    
-    
+
+    private static final String ENCODING_TYPE_BASE_64 = "BASE64";
+    private static final String ENCODING_TYPE_HEXA = "HEXA";
+
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private IMqttClient loMqttClient;
@@ -113,8 +113,6 @@ public class ExternalConnector {
         publish(topic, msg);
     }
 
-    
-    
     public void sendCommandResponse(DataDownEventDto dataDownEventDto) {
         Optional<LoCommand> loCommand = commandMapper.get(dataDownEventDto.getDataDownId());
         
@@ -148,17 +146,17 @@ public class ExternalConnector {
             throw new LoMqttException(e);
         }
     }
-    
+
     private void convertPayload(DataUpDto dataUpDto) {
         switch (dataUpDto.getEncodingType()) {
-            case "BASE64":
-                byte[] payload = Base64.getDecoder().decode(dataUpDto.getPayload());
-                dataUpDto.setPayload(new String(payload));
+            case ENCODING_TYPE_BASE_64:
+                String decodedFromBase64 = PayloadCodec.decodeFromBase64(dataUpDto.getPayload());
+                dataUpDto.setPayload(decodedFromBase64);
                 break;
-            case "HEXA":
+            case ENCODING_TYPE_HEXA:
                 try {
-                    byte[] decodeHex = Hex.decodeHex(dataUpDto.getPayload());
-                    dataUpDto.setPayload(new String(decodeHex));
+                    String decodedFromHex = PayloadCodec.decodeFromHex(dataUpDto.getPayload());
+                    dataUpDto.setPayload(decodedFromHex);
                 } catch (DecoderException e) {
                     throw new EncodingTypeException(e);
                 }
@@ -167,7 +165,7 @@ public class ExternalConnector {
                 break;
         }
     }
-    
+
     protected class MessageListener implements IMqttMessageListener {
 
         private static final String CONTENT_TYPE_TEXT = "TEXT";
